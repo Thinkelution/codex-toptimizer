@@ -91,7 +91,7 @@ class Dashboard:
             if project not in projects:
                 projects[project] = {'path': project, 'name': Path(project).name or project, 'tasks': []}
             projects[project]['tasks'].append(row)
-        return {'tasks': rows, 'projects': list(projects.values()),
+        return {'tasks': rows, 'projects': list(projects.values()), 'home_directory': str(Path.home()),
                 'deleted': sorted(trash, key=lambda row: row['deleted_at'], reverse=True)}
 
     def detail(self, task):
