@@ -241,6 +241,16 @@ print(json.dumps({'type':'turn.completed','usage':{'input_tokens':10,'cached_inp
         self.assertEqual(len(detail['report']['model_turns']), 2)
         self.assertEqual(detail['status']['codex_thread'], 'fixture-thread')
 
+    def test_older_failed_turn_exposes_its_saved_stderr(self):
+        task = self.create()
+        out = self.server.app.path(task) / 'turns' / 'old'; out.mkdir()
+        (out / 'run.json').write_text(json.dumps({'execution_status': 'failed', 'returncode': 1, 'answer': ''}))
+        (out / 'stderr.log').write_text('Not inside a trusted directory and --skip-git-repo-check was not specified.')
+        code, detail = self.request('/api/detail', {'task': task})
+        self.assertEqual(code, 200)
+        self.assertIn('trusted Git repository', detail['turns'][0]['error'])
+        self.assertIn('--skip-git-repo-check', detail['turns'][0]['error'])
+
     def test_usage_and_completed_turn_are_visible(self):
         task = self.create()
         from tasklean.storage import write_json

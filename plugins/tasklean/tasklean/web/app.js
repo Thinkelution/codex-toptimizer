@@ -112,7 +112,21 @@ async function refresh() {
   rendered = signature;
   const conversation = $('conversation'); conversation.replaceChildren();
   if (!d.turns.length) conversation.append(element('p', 'No Codex turns yet. Give this task its next step below.', 'empty'));
-  for (const t of d.turns) { const card=element('article','','turn'); if(t.prompt) card.append(element('small','YOU'), element('pre',t.prompt)); card.append(element('small',`CODEX · ${t.execution_status} · ${t.sandbox} · ${t.elapsed_seconds}s`),element('pre',t.answer || 'No final answer returned. Inspect the saved turn files for details.')); conversation.append(card); }
+  for (const t of d.turns) {
+    const card=element('article','','turn');
+    if(t.prompt) card.append(element('small','YOU'), element('pre',t.prompt));
+    card.append(element('small',`CODEX · ${t.execution_status} · ${t.sandbox} · ${t.elapsed_seconds}s`));
+    if(t.error) card.append(element('pre',t.error,'turn-error'));
+    if(t.answer) card.append(element('pre',t.answer));
+    else if(!t.error) card.append(element('pre','No final answer returned. Inspect the saved turn files for details.'));
+    if(t.execution_status !== 'completed' && t.prompt) {
+      const retry=element('button','Use prompt again','quiet'); retry.type='button';
+      retry.disabled=busy;
+      retry.onclick=()=>{$('prompt').value=t.prompt; drafts.set(current,t.prompt); $('prompt').focus();};
+      card.append(retry);
+    }
+    conversation.append(card);
+  }
   if (busy) conversation.append(element('p','Codex is working on your prompt. Results and usage appear when the turn finishes.','running'));
   if (d.job.error) conversation.append(element('p',d.job.error,'running'));
   $('notes').replaceChildren();

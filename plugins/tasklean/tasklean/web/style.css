@@ -9,3 +9,5 @@
 @media(max-width:700px){nav#tasks{display:block;max-height:260px;overflow:auto}.project-group>button{width:100%;max-width:none}.task-actions{min-width:105px}.task-heading .task-actions .danger{font-size:11px;padding:7px 10px}}
 
 .models-status{display:flex;align-items:center;justify-content:space-between;gap:12px}.models-status .footnote{margin:5px 0}.models-status button{font-size:10px;white-space:nowrap;padding:5px 8px}
+
+.turn .turn-error{color:#924b2b;background:#fff3e9;padding:12px;border-radius:6px}.turn>button{margin-top:14px}

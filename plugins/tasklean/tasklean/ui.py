@@ -13,6 +13,7 @@ from urllib.parse import urlsplit
 
 from .launcher import doctor, launch
 from .limits import LimitsReader
+from .runner import failure_summary
 from .storage import write_json
 from .workspace import Workspace, initialize
 
@@ -109,6 +110,7 @@ class Dashboard:
                 try:
                     data = json.loads(record.read_text())
                     turns.append({k: data.get(k) for k in ('turn', 'answer', 'execution_status', 'execution_usage', 'elapsed_seconds', 'sandbox')})
+                    turns[-1]['error'] = failure_summary(out, data)
                     prompt_file = out / 'user_prompt.txt'
                     if prompt_file.exists():
                         turns[-1]['prompt'] = prompt_file.read_text()
