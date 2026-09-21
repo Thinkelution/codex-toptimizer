@@ -4,10 +4,10 @@ The beta includes a local browser dashboard, CLI launcher and Codex plugin. It s
 
 ## 1. Install the beta
 
-Until the pull request is merged, use the feature branch:
+Clone the main branch:
 
 ```bash
-git clone --branch feat/task-sessions https://github.com/Thinkelution/codex-toptimizer.git
+git clone https://github.com/Thinkelution/codex-toptimizer.git
 cd codex-toptimizer
 python3 -m venv .venv
 . .venv/bin/activate
