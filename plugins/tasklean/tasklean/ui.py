@@ -232,8 +232,8 @@ def make_server(directory, port=0, binary=None):
                 self.reply(200, app.limits.read(force=urlsplit(self.path).query == 'refresh=1'))
             elif route == '/api/doctor':
                 self.reply(200, doctor(app.binary))
-            elif route in ('/', '/app.js', '/style.css'):
-                name, mime = {'/': ('index.html', 'text/html; charset=utf-8'), '/app.js': ('app.js', 'text/javascript; charset=utf-8'), '/style.css': ('style.css', 'text/css; charset=utf-8')}[route]
+            elif route in ('/', '/app.js', '/style.css', '/icon.svg'):
+                name, mime = {'/': ('index.html', 'text/html; charset=utf-8'), '/app.js': ('app.js', 'text/javascript; charset=utf-8'), '/style.css': ('style.css', 'text/css; charset=utf-8'), '/icon.svg': ('icon.svg', 'image/svg+xml')}[route]
                 self.reply(200, (assets / name).read_bytes(), mime)
             else:
                 self.reply(404, {'error': 'Not found'})
