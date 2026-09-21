@@ -1,0 +1,162 @@
+{
+  "title": "Pocket Ledger: normal Codex versus the LeanTask launcher",
+  "date": "2026-09-21",
+  "publisher": "Thinkelution",
+  "design": "A deliberately created sample app-building task, one measured run per approach; not a customer production deployment or a statistical savings estimate.",
+  "model": "gpt-6-astra",
+  "reasoning": "high",
+  "codex_version": "codex-cli 0.153.4",
+  "leantask_version": "0.3.0b6",
+  "leantask_source_commit": "7cb9ca66de09a79b33b89a5920e920cccbd88410",
+  "platform": "macOS",
+  "python_version": "3.13.13",
+  "node_version": "25.2.1",
+  "run_order": [
+    "leantask",
+    "baseline"
+  ],
+  "order_random_seed": 21,
+  "timeout_seconds_per_run": 900,
+  "sandbox": "workspace-write",
+  "fresh_conversations": true,
+  "identical_starting_fingerprints": true,
+  "configuration": "Both CLI runs used --ignore-user-config and explicit model/reasoning, retaining existing policy rules. LeanTask added its source launcher guidance and five task-scoped MCP tools; no global companion-plugin installation.",
+  "original_prompt_sha256": "2acda5264fc8a962acbecf5c2ba6287f386f073578e1e8f8275cbc79bc630e5d",
+  "original_prompt_characters": 2227,
+  "fixed_acceptance_tests": 23,
+  "profiles": {
+    "baseline": {
+      "usage": {
+        "available": true,
+        "failed_event": false,
+        "turns": 1,
+        "input_tokens": 435704,
+        "cached_input_tokens": 396800,
+        "output_tokens": 26973,
+        "total_tokens": 462677,
+        "uncached_input_tokens": 38904
+      },
+      "elapsed_seconds": 857.314,
+      "execution_status": "completed",
+      "mcp_calls": {},
+      "native_command_count": 13,
+      "raw_turn_usage": [
+        {
+          "input_tokens": 435704,
+          "cached_input_tokens": 396800,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 26973,
+          "reasoning_output_tokens": 1686
+        }
+      ],
+      "patch_verification_failures": 1,
+      "verification": {
+        "fixed_acceptance_tests_passed": 23,
+        "fixed_inputs_unchanged": true,
+        "javascript_syntax_passed": true,
+        "independent_browser_checks": {
+          "empty_state": "pass: initial $0.00 and no entries",
+          "add_and_totals": "pass: $12.50 Food + $5.00 Travel = $17.50, count 2",
+          "date_order": "pass: Sep 3 Bus before Sep 2 Tea",
+          "search": "pass: trimmed case-insensitive bus search gives $5.00/count 1",
+          "combined_filters": "pass: Food and September gives Tea/$12.50; nonmatching combination gives empty state",
+          "delete": "pass: delete Tea reduces stored count and survives reload",
+          "persistence": "pass: added entries survive reload",
+          "inline_error": "pass: amount 0 rejected with helpful visible alert; total unchanged",
+          "safe_text": "pass: HTML-like description renders as literal text in browser",
+          "responsive": "pass: 375px viewport reports page width 375px; mobile and 1280px layouts visually inspected",
+          "csv": "Export CSV button exercised with Travel filter; downloaded file not independently verified. CSV function checked by fixed acceptance tests.",
+          "console": "no warnings or errors reported by browser during checks",
+          "malformed_storage": "source reviewed; not independently exercised in the real browser"
+        }
+      }
+    },
+    "leantask": {
+      "usage": {
+        "available": true,
+        "failed_event": false,
+        "turns": 1,
+        "input_tokens": 136659,
+        "cached_input_tokens": 111488,
+        "output_tokens": 11163,
+        "total_tokens": 147822,
+        "uncached_input_tokens": 25171
+      },
+      "elapsed_seconds": 356.952,
+      "execution_status": "completed",
+      "mcp_calls": {
+        "tasklean_read": 3
+      },
+      "native_command_count": 6,
+      "raw_turn_usage": [
+        {
+          "input_tokens": 136659,
+          "cached_input_tokens": 111488,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 11163,
+          "reasoning_output_tokens": 427
+        }
+      ],
+      "patch_verification_failures": 0,
+      "verification": {
+        "fixed_acceptance_tests_passed": 23,
+        "fixed_inputs_unchanged": true,
+        "javascript_syntax_passed": true,
+        "independent_browser_checks": {
+          "empty_state": "pass: initial $0.00 and no entries",
+          "add_and_totals": "pass: $12.50 Food + $5.00 Travel = $17.50, count 2",
+          "date_order": "pass: Sep 3 Bus before Sep 2 Tea",
+          "search": "pass: trimmed case-insensitive bus search gives $5.00/count 1",
+          "combined_filters": "pass: Food and September gives Tea/$12.50; nonmatching combination gives empty state",
+          "delete": "pass: delete Tea reduces stored count and survives reload",
+          "persistence": "pass: added entries survive reload",
+          "inline_error": "pass: amount 0 rejected with helpful visible alert; total unchanged",
+          "safe_text": "pass: HTML-like description renders as literal text in browser",
+          "responsive": "pass: 375px viewport reports page width 375px; mobile and 1280px layouts visually inspected",
+          "csv": "app reports Exported 1 expenses as CSV; browser download event timed out, so downloaded file not verified. Fixed CSV function tests pass.",
+          "console": "no warnings or errors reported by browser during checks",
+          "malformed_storage": "source reviewed; not independently exercised in the real browser"
+        }
+      }
+    }
+  },
+  "observed_tokens_fewer_with_leantask": 314855,
+  "observed_token_reduction_percent": 68.05,
+  "separate_optimizer_inference_tokens": 0,
+  "launcher_added_prompt_characters": 764,
+  "leantask_tool_character_diagnostics": [
+    {
+      "operation": "command",
+      "calls": 1,
+      "source_chars": 1170,
+      "returned_chars": 1730
+    },
+    {
+      "operation": "read",
+      "calls": 3,
+      "source_chars": 3336,
+      "returned_chars": 4059
+    }
+  ],
+  "interpretation": "Observed difference only; not a causal attribution to compression or a general savings rate. Small file reads and the captured log grew with metadata.",
+  "confounders": [
+    "Normal Codex retried one invalid patch.",
+    "Normal Codex attempted additional browser checks blocked by the subprocess sandbox; both runs later reported passing simulated-DOM checks.",
+    "Single pair, no repetitions or statistical uncertainty estimate; model variability, cache behavior and independent execution choices were not isolated."
+  ],
+  "accounting": "Input plus output. Cached input is a subset of input; reasoning output is not added again. Token counts are not dollar costs or subscription allowance.",
+  "excluded_scope": "Coordinating conversation, fixture creation, independent verification and report preparation.",
+  "rejected_setup_attempts": {
+    "count": 2,
+    "model": "gpt-5.4",
+    "reason": "Account rejected the configured model before code generation.",
+    "usage": null,
+    "treatment": "Unknown, not zero. Excluded from the successful-model pair; total account spend is not established."
+  },
+  "evidence_scope": "Curated usage and verification record. Full prompts are supplied separately; full execution transcripts, local paths and account identifiers are not published.",
+  "fixture_sha256": {
+    "package.json": "fbe3cf224544565e9f93d1da093aa85a3ded4b5d5c6f06e6adb544dbda142bb7",
+    "README.md": "f82d4679dbdb98075b899f0e8780ac641a7e9cb749855d80f45398153400264c",
+    "test/ledger.test.js": "79148667a17e1b6d74224b43a44464c6a0b57d31b8b95988bce4d8de770bf1c6"
+  }
+}
