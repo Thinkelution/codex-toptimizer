@@ -1,0 +1,124 @@
+{
+  "fixture": "Generated 20000-row CSV; no model inference",
+  "initial": {
+    "pid": 2807062,
+    "root": "/home/administrator/.cache/tasklean-smoke-20260921",
+    "datasets": [],
+    "parse_count": 0,
+    "cache_hits": 0,
+    "cache_bytes_estimate": 0,
+    "cache_budget_bytes": 33554432,
+    "transport_reused": true,
+    "roundtrip_ms": 775.45
+  },
+  "ssh_before": {
+    "connected": true,
+    "master_pid": 8469
+  },
+  "first_load": {
+    "cache_hit": false,
+    "rows": 20000,
+    "columns": [
+      "animal",
+      "score",
+      "region"
+    ],
+    "source_bytes": 278021,
+    "memory_bytes_estimate": 9311244,
+    "source_sha256": "b82734039d612e04232ec6befc3e37773e23cc4dbaeeb0cc9310e4250a08b7d6",
+    "transport_reused": true,
+    "roundtrip_ms": 1200.6
+  },
+  "second_load": {
+    "cache_hit": true,
+    "rows": 20000,
+    "columns": [
+      "animal",
+      "score",
+      "region"
+    ],
+    "source_bytes": 278021,
+    "memory_bytes_estimate": 9311244,
+    "source_sha256": "b82734039d612e04232ec6befc3e37773e23cc4dbaeeb0cc9310e4250a08b7d6",
+    "transport_reused": true,
+    "roundtrip_ms": 786.31
+  },
+  "aggregate": {
+    "groups": [
+      {
+        "group": "cat",
+        "count": 5000,
+        "sum": 240000.0,
+        "mean": 48.0
+      },
+      {
+        "group": "dog",
+        "count": 5000,
+        "sum": 245000.0,
+        "mean": 49.0
+      },
+      {
+        "group": "fox",
+        "count": 5000,
+        "sum": 250000.0,
+        "mean": 50.0
+      },
+      {
+        "group": "owl",
+        "count": 5000,
+        "sum": 255000.0,
+        "mean": 51.0
+      }
+    ],
+    "total_groups": 4,
+    "truncated": false,
+    "transport_reused": true,
+    "roundtrip_ms": 884.95
+  },
+  "after_queries": {
+    "pid": 2807062,
+    "root": "/home/administrator/.cache/tasklean-smoke-20260921",
+    "datasets": [
+      "animals"
+    ],
+    "parse_count": 1,
+    "cache_hits": 2,
+    "cache_bytes_estimate": 9311244,
+    "cache_budget_bytes": 33554432,
+    "transport_reused": true,
+    "roundtrip_ms": 780.81
+  },
+  "ssh_after": {
+    "connected": true,
+    "master_pid": 8469
+  },
+  "stale_data_rejected": "Worker: Dataset changed or disappeared; explicitly load it again",
+  "reload": {
+    "cache_hit": false,
+    "rows": 20001,
+    "columns": [
+      "animal",
+      "score",
+      "region"
+    ],
+    "source_bytes": 258032,
+    "memory_bytes_estimate": 9311700,
+    "source_sha256": "4638686ef6d3546c5a677259c29acc13f94f70d10c16b56127ced5cd0b754fe6",
+    "transport_reused": true,
+    "roundtrip_ms": 1263.72
+  },
+  "after_reload": {
+    "pid": 2807062,
+    "root": "/home/administrator/.cache/tasklean-smoke-20260921",
+    "datasets": [
+      "animals"
+    ],
+    "parse_count": 2,
+    "cache_hits": 2,
+    "cache_bytes_estimate": 9311700,
+    "cache_budget_bytes": 33554432,
+    "transport_reused": true,
+    "roundtrip_ms": 770.02
+  },
+  "aggregate_response_bytes": 357
+}

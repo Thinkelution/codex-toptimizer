@@ -1,0 +1,18 @@
+{
+  "name": "tasklean",
+  "version": "0.2.0+codex.20260921083420",
+  "description": "Task-scoped SSH and dataset reuse, reviewable prompt optimization, and measured Codex usage.",
+  "author": {
+    "name": "Local developer"
+  },
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "TaskLean",
+    "shortDescription": "Reuse task state and measure task efficiency.",
+    "longDescription": "Local/SSH prototype with reusable connections, bounded in-memory datasets, passive prompt-size telemetry, optional prompt rewriting and measured usage. Savings are not guaranteed.",
+    "developerName": "Local developer",
+    "category": "Productivity",
+    "capabilities": [],
+    "defaultPrompt": "Audit this project for unnecessary context and explain what TaskLean can measure."
+  }
+}

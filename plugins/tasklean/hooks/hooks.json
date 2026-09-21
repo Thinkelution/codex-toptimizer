@@ -1,0 +1,12 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [{
+      "hooks": [{
+        "type": "command",
+        "command": "python3 \"${PLUGIN_ROOT}/hooks/prompt_metrics.py\"",
+        "timeout": 2,
+        "statusMessage": "Recording local prompt size"
+      }]
+    }]
+  }
+}

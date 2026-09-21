@@ -1,0 +1,7 @@
+Please review the CSV export implementation in src/export.py and identify why the date field is formatted inconsistently. We have noticed that the date field has inconsistent formatting in exported CSV files and would like that inconsistency fixed. The desired result is consistent dates throughout the exported file.
+
+Preserve the existing column order and public API.
+Do not change timezone conversion behavior.
+Only edit src/export.py and tests/test_export.py.
+Add a regression test for a missing date and an ISO date.
+Run the relevant export tests and report the result.
