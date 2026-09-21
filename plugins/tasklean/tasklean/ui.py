@@ -22,6 +22,8 @@ class Dashboard:
         self.directory.mkdir(mode=0o700, parents=True, exist_ok=True)
         self.registry = self.directory / 'tasks.json'
         self.tasks = json.loads(self.registry.read_text()) if self.registry.exists() else {}
+        self.trash_file = self.directory / 'deleted-tasks.json'
+        self.deleted = json.loads(self.trash_file.read_text()) if self.trash_file.exists() else {}
         self.binary = binary
         self.token = secrets.token_urlsafe(32)
         self.lock = threading.RLock()
@@ -30,7 +32,7 @@ class Dashboard:
 
     def path(self, task):
         with self.lock:
-            if task not in self.tasks:
+            if task not in self.tasks or task in self.deleted:
                 raise ValueError('Unknown task')
             return Path(self.tasks[task])
 
@@ -43,19 +45,53 @@ class Dashboard:
             temporary = self.directory / ('registry-' + uuid.uuid4().hex + '.tmp')
             write_json(temporary, self.tasks)
             os.replace(temporary, self.registry)
+            if task in self.deleted:
+                self.set_deleted(task, False)
         return {'task': task}
 
+    def set_deleted(self, task, deleted=True):
+        # Soft deletion changes dashboard visibility only. Project and task files stay intact.
+        with self.lock:
+            if task not in self.tasks:
+                raise ValueError('Unknown task')
+            if self.jobs.get(task, {}).get('state') == 'running':
+                raise ValueError('Wait for the running turn to finish before deleting this task')
+            if not deleted and task not in self.deleted:
+                raise ValueError('Task is not deleted')
+            updated = dict(self.deleted)
+            if deleted:
+                updated[task] = time.time()
+            else:
+                updated.pop(task)
+            temporary = self.directory / ('deleted-' + uuid.uuid4().hex + '.tmp')
+            write_json(temporary, updated)
+            os.replace(temporary, self.trash_file)
+            self.deleted = updated
+        return {'task': task, 'deleted': deleted}
+
     def listing(self):
-        rows = []
+        rows, trash = [], []
         with self.lock:
             entries = list(self.tasks.items())
+            deleted = dict(self.deleted)
         for task, path in entries:
             try:
                 with Workspace(path) as work:
-                    rows.append({'id': task, 'goal': work.config['goal'], 'project': str(work.project)})
+                    row = {'id': task, 'goal': work.config['goal'], 'project': str(work.project)}
             except (OSError, ValueError, KeyError):
-                rows.append({'id': task, 'goal': 'Unavailable task', 'project': path})
-        return {'tasks': rows}
+                row = {'id': task, 'goal': 'Unavailable task', 'project': path}
+            if task in deleted:
+                trash.append({**row, 'deleted_at': deleted[task]})
+            else:
+                rows.append(row)
+        projects = {}
+        for row in rows:
+            project = row['project']
+            if project not in projects:
+                projects[project] = {'path': project, 'name': Path(project).name or project, 'tasks': []}
+            projects[project]['tasks'].append(row)
+        return {'tasks': rows, 'projects': list(projects.values()),
+                'deleted': sorted(trash, key=lambda row: row['deleted_at'], reverse=True)}
 
     def detail(self, task):
         directory = self.path(task)
@@ -98,6 +134,7 @@ class Dashboard:
         # Validate prerequisites synchronously before accepting a background turn.
         launch(directory, prompt, **args)
         with self.lock:
+            self.path(task)  # Recheck after validation, in case the task was deleted meanwhile.
             if self.jobs.get(task, {}).get('state') == 'running':
                 raise ValueError('This task already has a running turn')
             self.jobs[task] = {'state': 'running', 'started': time.time(), 'prompt': prompt}
@@ -134,6 +171,10 @@ class Dashboard:
         task = data.get('task')
         if not isinstance(task, str):
             raise ValueError('Task ID is required')
+        if route == '/api/delete':
+            return self.set_deleted(task)
+        if route == '/api/restore':
+            return self.set_deleted(task, False)
         if route == '/api/detail':
             return self.detail(task)
         if route == '/api/run':

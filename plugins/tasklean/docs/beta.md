@@ -172,6 +172,12 @@ Run the suite from the repository with `cd plugins/tasklean && python3 -m unitte
 
 The account-limit integration uses the documented [Codex app-server account/rateLimits/read endpoint](https://learn.chatgpt.com/docs/app-server#6-rate-limits-chatgpt). It preserves multiple quota groups, prefers `rateLimitsByLimitId`, and falls back to the legacy `rateLimits` field. Missing percentages and reset times remain unknown. Account-limit snapshots stay in process memory and are not written to task reports or sent to the public website.
 
+## Organize and delete tasks
+
+The sidebar groups tasks by their resolved project folder. Expand or collapse a project, use its **New task** button, or choose a recent folder when creating a task. Folders with the same name stay separate; their full paths appear in the sidebar.
+
+Use **Delete task** on an idle task to move it to **Recently deleted**. Confirm the dialog to remove it from the active project list. Restore it from **Recently deleted**; the deletion state survives dashboard restarts. This is a recoverable dashboard deletion: project files, task conversations, notes, and logs remain on disk, and reimporting the task restores it. A running dashboard turn must finish before deletion. Deletion does not reclaim disk space or delete the underlying Codex conversation.
+
 ## What the efficiency claim means
 
 Tokens are the pieces of text a model reads and writes. Codex LeanTask gives Codex a more organized workbench: selected code reads, short task notes, and compact command output with full logs retained for inspection. For repeated work, authorized SSH connections and parsed datasets can also be reused.

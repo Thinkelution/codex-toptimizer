@@ -15,3 +15,5 @@
 .brand-preview .beta{font-size:7px;padding:2px 4px;letter-spacing:1px}
 @media(max-width:950px) and (min-width:681px){.brand-preview{flex-wrap:wrap}.brand-preview .beta{margin-left:27px}}
 @media(max-width:680px){header{flex-wrap:wrap;gap:20px}.brand .brand-name{font-size:24px}.brand .brand-name small{font-size:11px}.brand .mark{font-size:25px}header nav{margin-left:auto}}
+
+.hero-caveat{font-size:12px;color:#61765a;max-width:480px;line-height:1.7}
