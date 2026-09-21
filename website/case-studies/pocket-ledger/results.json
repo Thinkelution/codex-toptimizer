@@ -158,5 +158,79 @@
     "package.json": "fbe3cf224544565e9f93d1da093aa85a3ded4b5d5c6f06e6adb544dbda142bb7",
     "README.md": "f82d4679dbdb98075b899f0e8780ac641a7e9cb749855d80f45398153400264c",
     "test/ledger.test.js": "79148667a17e1b6d74224b43a44464c6a0b57d31b8b95988bce4d8de770bf1c6"
+  },
+  "sandbox_retry_adjustment": {
+    "kind": "Accounting-only subtraction from a measured run; not a sandbox-free rerun or a prediction.",
+    "source": "Detailed normal-run session token_count records, using last_token_usage per model request.",
+    "all_request_records_count": 13,
+    "all_request_usage_reconciles_with_completed_run": true,
+    "reconciled_fields": [
+      "input_tokens",
+      "cached_input_tokens",
+      "output_tokens",
+      "total_tokens"
+    ],
+    "excluded_requests": [
+      {
+        "request_index": 9,
+        "usage_recorded_at_utc": "2026-09-21T12:24:42.407Z",
+        "usage": {
+          "input_tokens": 41350,
+          "cached_input_tokens": 37888,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 236,
+          "reasoning_output_tokens": 51,
+          "total_tokens": 41586
+        },
+        "description": "Retry browser verification through local-file access after the temporary HTTP server was denied."
+      },
+      {
+        "request_index": 10,
+        "usage_recorded_at_utc": "2026-09-21T12:24:52.762Z",
+        "usage": {
+          "input_tokens": 41678,
+          "cached_input_tokens": 41216,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 192,
+          "reasoning_output_tokens": 38,
+          "total_tokens": 41870
+        },
+        "description": "Adjust browser-process cleanup and retry local-file verification after the previous attempt failed."
+      }
+    ],
+    "excluded_usage": {
+      "input_tokens": 83028,
+      "cached_input_tokens": 79104,
+      "output_tokens": 428,
+      "total_tokens": 83456
+    },
+    "adjusted_normal_codex_usage": {
+      "input_tokens": 352676,
+      "cached_input_tokens": 317696,
+      "output_tokens": 26545,
+      "total_tokens": 379221,
+      "uncached_input_tokens": 34980
+    },
+    "leantask_measured_total_tokens": 147822,
+    "numerical_gap_tokens": 231399,
+    "numerical_gap_percent": 61.02,
+    "retained": [
+      "Initial browser verification attempt",
+      "Successful fallback simulated-DOM checks",
+      "Patch retry",
+      "Final checks and answer",
+      "All remaining requests at their original measured context and cache usage, including any failure-related text"
+    ],
+    "limitations": [
+      "A successful browser check would return different output and could change subsequent actions.",
+      "This does not remove all downstream effects of the failures or model the alternate successful path.",
+      "The adjusted comparison is not a measured savings rate, a causal estimate of LeanTask benefit, or an upper/lower bound on a sandbox-free run.",
+      "No adjusted elapsed time, dollar cost or subscription allowance is inferred."
+    ]
+  },
+  "recurring_work_hypothesis": {
+    "claim": "Repeated work on the same task can offer greater opportunities for token savings when focused reads, saved notes and retrievable logs avoid redundant context.",
+    "evidence_status": "Expected use case; not measured in this single app-building pair.",
+    "qualification": "Ordinary Codex also supports continuation and efficient reads. Actual savings depend on reuse and context avoided; growing history and tool overhead can offset benefits."
   }
 }

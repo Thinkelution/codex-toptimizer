@@ -39,7 +39,7 @@
         <div class="result-caveat"><strong>An observation, not a general savings claim.</strong> The normal run retried a failed patch and attempted browser checks that its sandbox blocked. Those attempts count toward its usage. This test does not establish that LeanTask’s context tools caused the 68.05% difference.</div>
       </section>
 
-      <nav class="case-toc" aria-label="On this page"><a href="#task">The task</a><a href="#measurements">Measurements</a><a href="#method">Method</a><a href="#findings">What happened</a><a href="#quality">Quality checks</a><a href="#evidence">Evidence</a></nav>
+      <nav class="case-toc" aria-label="On this page"><a href="#task">The task</a><a href="#measurements">Measurements</a><a href="#without-sandbox-retries">Without sandbox retries</a><a href="#method">Method</a><a href="#findings">What happened</a><a href="#quality">Quality checks</a><a href="#recurring-work">Recurring work</a><a href="#evidence">Evidence</a></nav>
 
       <section id="task" class="case-section case-split">
         <div><p class="eyebrow">01 / THE USE CASE</p><h2>Build Pocket Ledger.</h2><p>A deliberately created sample task with real model execution, rather than a customer production deployment. The brief was to build a complete local expense tracker using vanilla JavaScript, HTML and CSS, without external dependencies or services.</p></div>
@@ -63,6 +63,22 @@
         <div class="accounting"><h3>How the difference was calculated</h3><p><code>462,677 − 147,822 = 314,855 tokens</code><br><code>314,855 ÷ 462,677 × 100 = 68.05%</code></p><p>Cached input is not added a second time. Reasoning tokens are part of output and are not added again. Token counts are not equivalent to dollar costs or Codex subscription allowance.</p></div>
       </section>
 
+      <section id="without-sandbox-retries" class="case-section">
+        <p class="eyebrow">ADDITIONAL ANALYSIS / ACCOUNTING ESTIMATE</p>
+        <h2>What if the sandbox checks hadn’t failed?</h2>
+        <p>We cannot recover the exact usage of a run that did not happen. We can isolate two recorded model requests that retried browser verification after the initial sandbox failure. Subtracting their usage gives a <strong>retry-excluded subtotal of 379,221 tokens</strong> for normal Codex.</p>
+        <div class="table-scroll" role="region" aria-label="Normal Codex usage with two sandbox-related retries excluded" tabindex="0"><table><caption>Accounting adjustment to the existing run · not a new measured run</caption><thead><tr><th scope="col">Calculation</th><th scope="col">Tokens</th></tr></thead><tbody>
+          <tr><th scope="row">Normal Codex, measured total</th><td>462,677</td></tr>
+          <tr><th scope="row">Exclude local-file browser retry <span class="cell-note">Request 9: 41,350 input + 236 output</span></th><td>−41,586</td></tr>
+          <tr><th scope="row">Exclude browser cleanup-and-retry request <span class="cell-note">Request 10: 41,678 input + 192 output</span></th><td>−41,870</td></tr>
+          <tr class="table-total"><th scope="row">Normal Codex, retry-excluded subtotal <span class="cell-note">462,677 − 83,456</span></th><td>379,221</td></tr>
+          <tr><th scope="row">LeanTask, original measured total</th><td>147,822</td></tr>
+        </tbody></table></div>
+        <p>The numerical gap between this adjusted subtotal and the measured LeanTask run is <strong>231,399 tokens (61.02%)</strong>. That is an accounting comparison, not a measured sandbox-free savings rate.</p>
+        <div class="accounting"><h3>What this estimate keeps—and what it cannot tell us</h3><p>It retains the original browser-verification attempt, the later successful simulated-DOM tests, the patch retry, final checks and answer. It also leaves later requests’ recorded context and cache usage unchanged, including any failure-related text they read.</p><p>A successful browser check would have produced different output and could have changed subsequent actions. This subtraction does not model that alternate path, remove every downstream effect of the failure, or establish that LeanTask caused the remaining difference. No sandbox-free runtime or dollar-cost estimate is inferred.</p></div>
+        <p class="case-note">Source: per-request usage records in the normal run’s detailed session log. The sum of all 13 recorded requests reconciles exactly with its completed-run input, cached-input, output and total token counts. The two excluded requests contain 79,104 cached-input tokens, already included in their 83,456-token total. Selected records and the calculation are included in the <a href="results.json">downloadable measurement record</a>.</p>
+      </section>
+
       <section id="method" class="case-section">
         <p class="eyebrow">03 / THE METHOD</p><h2>Same task. Same starting point.</h2>
         <dl class="method-grid"><div><dt>Model and reasoning</dt><dd><code>gpt-6-astra</code>, high reasoning, for both runs.</dd></div><div><dt>Starting files</dt><dd>Identical Git commit and matching workspace fingerprints; the same 2,227-character prompt and fixed tests.</dd></div><div><dt>Execution environment</dt><dd>macOS, Codex CLI 0.153.4, Python 3.13.13 and Node.js 25.2.1. Both used fresh conversations and a workspace-write sandbox.</dd></div><div><dt>Configuration</dt><dd>Both skipped user configuration and set model and reasoning explicitly. Existing policy rules remained. This is a controlled CLI comparison, not a replay of all desktop settings.</dd></div><div><dt>Run order</dt><dd>LeanTask, then normal Codex; selected using a recorded random seed of 21. One run per approach, without repetitions.</dd></div><div><dt>LeanTask setup</dt><dd>Version 0.3.0b6, run directly from cloned source. Its launcher attached five task-scoped MCP tools. No global companion-plugin installation was involved.</dd></div></dl>
@@ -83,6 +99,12 @@
 
       <section class="case-section conclusions" aria-labelledby="conclusion-heading">
         <p class="eyebrow">06 / WHAT THIS RESULT SUPPORTS</p><h2 id="conclusion-heading">A useful first observation.<br>More evidence is still needed.</h2><p>In this pair, the LeanTask run completed the checked app-building task with fewer reported tokens and less elapsed time. That is the measured result.</p><p>One pair cannot separate the effects of the launcher from model variability, prompt caching, retries or verification choices. It does not establish a typical savings rate, a smaller bill, or a benefit from the companion plugin, prompt rewriting, remote datasets or multi-turn memory.</p><p>A stronger evaluation would repeat several tasks, counterbalance the run order, use consistent verification requirements, and report every attempt—including failures and optimizer overhead. <a href="https://github.com/Thinkelution/codex-toptimizer/blob/main/plugins/tasklean/docs/benchmark.md">Read our benchmark protocol.</a></p>
+      </section>
+
+      <section id="recurring-work" class="case-section">
+        <p class="eyebrow">FOLLOW-UP WORK / EXPECTED USE CASE</p><h2>Recurring work can offer more opportunities to save.</h2>
+        <p>Follow-up fixes, repeated checks and ongoing development on the same task give LeanTask more opportunities to reuse useful context. Focused reads, saved task notes and retrievable logs can help avoid sending the same large files or outputs again. The more redundant context these tools avoid, the greater the opportunity for token savings.</p>
+        <p>This is an expected use case, <strong>not a measured finding of this single app-building test</strong>. Ordinary Codex also supports continued conversations and efficient reads. Actual savings depend on what is reused and how much context is avoided; growing history and tool overhead can offset the benefit. Repeated work does not automatically guarantee greater savings.</p>
       </section>
 
       <section id="evidence" class="case-section">
