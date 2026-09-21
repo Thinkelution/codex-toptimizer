@@ -56,7 +56,7 @@ class DashboardTests(unittest.TestCase):
             read.assert_called_with(force=True)
 
     def test_assets_packaged_and_no_token_in_html(self):
-        for path in ('/', '/app.js', '/style.css'):
+        for path in ('/', '/app.js', '/style.css', '/icon.svg'):
             status, body = self.request(path, token=False)
             self.assertEqual(status, 200)
             self.assertNotIn(self.server.app.token.encode(), body)
