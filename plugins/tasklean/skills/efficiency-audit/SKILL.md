@@ -1,9 +1,9 @@
 ---
 name: efficiency-audit
-description: Use for TaskLean efficiency audits, prompt optimization, Codex usage comparison, or repeated SSH commands and CSV/JSON analysis across prompts. Reuse task-scoped connections and datasets and report measured limits.
+description: Use for Codex LeanTask efficiency audits, prompt optimization, Codex usage comparison, or repeated SSH commands and CSV/JSON analysis across prompts. Reuse task-scoped connections and datasets and report measured limits.
 ---
 
-# TaskLean
+# Codex LeanTask
 
 Use the bundled `scripts/tasklean.py` CLI relative to this plugin root.
 

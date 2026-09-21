@@ -80,8 +80,8 @@ def prepare(a):
             "prompt_estimated_tokens_reduced": metrics(original)['estimated_tokens'] - metrics(selected)['estimated_tokens'],
             "net_savings_measured": False, "requires_rewrite_acceptance": method == 'model_rewrite'}
     write_json(directory / 'plan.json', plan)
-    markup = '<!doctype html><meta charset="utf-8"><title>TaskLean prompt review</title><style>body{font:16px system-ui;max-width:1050px;margin:40px auto;padding:0 24px;background:#f8fafc;color:#172033}pre{white-space:pre-wrap;background:white;padding:20px;border:1px solid #dbe2eb;border-radius:10px}h1{letter-spacing:-1px}small{color:#475569}</style>'
-    markup += '<h1>TaskLean · Prompt review</h1><p>' + html.escape(reason) + '</p>'
+    markup = '<!doctype html><meta charset="utf-8"><title>Codex LeanTask prompt review</title><style>body{font:16px system-ui;max-width:1050px;margin:40px auto;padding:0 24px;background:#f8fafc;color:#172033}pre{white-space:pre-wrap;background:white;padding:20px;border:1px solid #dbe2eb;border-radius:10px}h1{letter-spacing:-1px}small{color:#475569}</style>'
+    markup += '<h1>Codex LeanTask · Prompt review</h1><p>' + html.escape(reason) + '</p>'
     markup += '<p><b>Prompt estimate: ' + str(plan['original']['estimated_tokens']) + ' → ' + str(plan['prepared']['estimated_tokens']) + '</b><br><small>Characters ÷ 4, not a tokenizer count. No task savings have been measured. Optimizer usage is included below.</small></p>'
     for title, content in [('Original', original), ('Prepared', selected), ('Changes', diff or 'No text changes.'), ('Measurement record', json.dumps(plan, indent=2))]:
         markup += '<h2>' + title + '</h2><pre>' + html.escape(content) + '</pre>'
@@ -199,7 +199,7 @@ def main(argv=None):
         args = parser().parse_args(argv)
         args.func(args)
     except (ValueError, OSError, KeyError, subprocess.SubprocessError) as e:
-        print(f'TaskLean: {e}', file=sys.stderr)
+        print(f'Codex LeanTask: {e}', file=sys.stderr)
         return 2
     return 0
 

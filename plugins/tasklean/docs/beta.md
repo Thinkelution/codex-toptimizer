@@ -1,6 +1,6 @@
-# TaskLean 0.3 beta: try it yourself
+# Codex LeanTask 0.3 beta: try it yourself
 
-The beta includes a local browser dashboard, CLI launcher and Codex plugin. It supports a reproducible offline demo and real multi-prompt Codex tasks. It does not require a hosted TaskLean service. macOS/Linux, Python 3.11+, and Git are required. Real model turns additionally require an installed, authenticated Codex CLI.
+The beta includes a local browser dashboard, CLI launcher and Codex plugin. It supports a reproducible offline demo and real multi-prompt Codex tasks. It does not require a hosted Codex LeanTask service. macOS/Linux, Python 3.11+, and Git are required. Real model turns additionally require an installed, authenticated Codex CLI.
 
 ## 1. Install the beta
 
@@ -12,10 +12,12 @@ cd codex-toptimizer
 python3 -m venv .venv
 . .venv/bin/activate
 python -m pip install ./plugins/tasklean
+codex plugin marketplace add .
+codex plugin add tasklean@codex-leantask
 tasklean doctor
 ```
 
-No global Codex configuration is changed by installation or the launcher. There are no runtime Python dependencies. Package building uses setuptools. You can also run `python3 plugins/tasklean/scripts/tasklean.py` instead of installing the command.
+This setup installs two components: the Python launcher/browser UI and the companion Codex plugin. The plugin commands register this repository as a plugin source and install `tasklean@codex-leantask` through Codex’s own CLI. Start a new Codex chat for skill discovery and review/trust its hook before it runs. `pip install` alone installs only the launcher package. The launcher can be used without the companion plugin and does not change global model or sandbox settings. There are no runtime Python dependencies. Package building uses setuptools. You can also run `python3 plugins/tasklean/scripts/tasklean.py` instead of installing the command.
 
 ## 2. Open the browser dashboard
 
@@ -131,7 +133,7 @@ Evidence-backed notes are marked stale after their source changes or disappears.
 
 `task report` distinguishes:
 
-- Characters in referenced source/logs and returned TaskLean results. These are diagnostic counts, not tokens saved, and omit native tools and schema/history overhead.
+- Characters in referenced source/logs and returned Codex LeanTask results. These are diagnostic counts, not tokens saved, and omit native tools and schema/history overhead.
 - Actual Codex-reported input, cached-input and output tokens for launcher turns. Cached input is included in input, not added again. Failed turns and missing usage remain visible.
 
 There is no guaranteed savings percentage. No dollar or subscription-quota estimate is inferred from raw token totals. A real comparison requires matched tasks, quality checks, all failures/retries and the optimizer's overhead. See [benchmark protocol](benchmark.md).
@@ -158,7 +160,7 @@ The [first real two-prompt smoke test](beta-live-smoke-2026-09-21.json) resumed 
 ## Troubleshooting and feedback
 
 - **Codex not found:** use `--codex-binary /absolute/path/to/codex`; the launcher also recognizes the bundled macOS app executable.
-- **Authentication/configuration error:** verify the Codex CLI normally first. TaskLean does not bypass or replace login.
+- **Authentication/configuration error:** verify the Codex CLI normally first. Codex LeanTask does not bypass or replace login.
 - **MCP startup failed:** check task-directory permissions and the printed evidence directory's `stderr.log`. The scoped MCP server is required, so startup failure is surfaced.
 - **A command fails or times out:** inspect its artifact before retrying. A timeout does not establish that a mutation failed to happen.
 - **A read is stale, truncated, or missing:** request a narrower fresh read. Use native tools for unsupported languages/files, preserving the same permission boundaries.
@@ -169,3 +171,13 @@ For feedback, share your version, platform, exact reproduction command, expected
 Run the suite from the repository with `cd plugins/tasklean && python3 -m unittest discover -s tests -v`. CI also installs the package and runs the offline demo on Python 3.11–3.13.
 
 The account-limit integration uses the documented [Codex app-server account/rateLimits/read endpoint](https://learn.chatgpt.com/docs/app-server#6-rate-limits-chatgpt). It preserves multiple quota groups, prefers `rateLimitsByLimitId`, and falls back to the legacy `rateLimits` field. Missing percentages and reset times remain unknown. Account-limit snapshots stay in process memory and are not written to task reports or sent to the public website.
+
+## What the efficiency claim means
+
+Tokens are the pieces of text a model reads and writes. Codex LeanTask gives Codex a more organized workbench: selected code reads, short task notes, and compact command output with full logs retained for inspection. For repeated work, authorized SSH connections and parsed datasets can also be reused.
+
+For example, “fix the cart total” followed by “add a regression test” may need only the relevant function, a note about quantity behavior, and a test summary. Avoiding repeated large file/log output can reduce context. The agent still has to select those tools. A continued task is not unique to LeanTask: ordinary Codex supports continued conversations and efficient tools too.
+
+The launcher may use fewer, equal or more tokens than running the same task directly in Codex. Its instructions, tool definitions, notes and receipts also cost context. No controlled comparison has established net savings yet. Compare identical tasks, starting code, model and quality requirements across the whole prompt sequence, counting retries and overhead. Token counts alone do not establish dollar savings or reduced weekly allowance consumption.
+
+The app’s display name is **Codex LeanTask**. The package, command, plugin ID and existing task-state paths remain `tasklean` for compatibility.

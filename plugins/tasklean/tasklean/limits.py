@@ -132,7 +132,7 @@ class LimitsReader:
                 start_new_session=True)
             self.selector = selectors.DefaultSelector()
             self.selector.register(self.proc.stdout, selectors.EVENT_READ)
-            self._request('initialize', {'clientInfo': {'name': 'tasklean_quota', 'title': 'TaskLean account limits', 'version': '0.3.0'}})
+            self._request('initialize', {'clientInfo': {'name': 'tasklean_quota', 'title': 'Codex LeanTask account limits', 'version': '0.3.0'}})
             self._send({'method': 'initialized', 'params': {}})
         return normalize(self._request('account/rateLimits/read'))
 

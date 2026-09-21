@@ -1,4 +1,4 @@
-# TaskLean public beta website
+# Codex LeanTask public beta website
 
 Static HTML, CSS, and JavaScript. No runtime dependencies, analytics, forms or task execution endpoints. Installation links point to the public repository's main branch. The workspace preview is illustrative content, not a model run.
 
@@ -12,7 +12,7 @@ Production: https://codex-lean-task.thinkelution.com/ . The alternate https://co
 
 ## Deployment
 
-Cloudflare remains proxied. Nginx serves only this directory from `/var/www/tasklean-site/current`, a symlink into versioned `releases/` directories. Private app releases and task state stay under the administrator's private home directory and are not web roots. Do not expose `tasklean ui` through this virtual host.
+Cloudflare can remain proxied. Nginx serves only this directory from `/var/www/tasklean-site/current`, a symlink into versioned `releases/` directories. Private app releases and task state stay under the administrator's private home directory and are not web roots. Do not expose `tasklean ui` through this virtual host.
 
 The host-specific configuration is in `ops/tasklean-site.nginx.conf`. Test with `sudo nginx -t` before reloading. Copy only public site assets to a new release, then replace the current symlink atomically. Roll back by pointing the symlink at the previous release and verifying responses. No app process restart is needed for static changes.
 

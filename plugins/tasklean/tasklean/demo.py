@@ -39,7 +39,7 @@ def fixture(directory):
     private_write(directory / 'cart.py', BUGGY + filler)
     private_write(directory / 'test_cart.py', TESTS)
     private_write(directory / '.gitignore', '__pycache__/\n*.pyc\n')
-    for args in [('init',), ('add', '.'), ('-c', 'user.name=TaskLean Demo', '-c', 'user.email=demo@example.invalid',
+    for args in [('init',), ('add', '.'), ('-c', 'user.name=Codex LeanTask Demo', '-c', 'user.email=demo@example.invalid',
                   '-c', 'commit.gpgsign=false', 'commit', '-m', 'Offline demo fixture')]:
         subprocess.run(['git', '-C', str(directory), *args], check=True, capture_output=True)
     return directory
@@ -86,7 +86,7 @@ def run_demo(directory):
                   'limitations': 'The repair is scripted, not performed by a model. This verifies mechanics and selected I/O sizes, not end-to-end LLM savings.'}
     write_json(out / 'report.json', report)
     body = '''<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>TaskLean beta · Offline walkthrough</title><style>
+<title>Codex LeanTask beta · Offline walkthrough</title><style>
 body{font:16px/1.6 system-ui;margin:0;background:#f3f5f7;color:#17212d}main{max-width:960px;margin:auto;padding:40px 24px}
 .tag{color:#14694b;font-weight:700}h1{font-size:42px;letter-spacing:-1.5px;line-height:1.1}h2{font-size:22px}
 .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}.card,pre{background:white;border:1px solid #dae0e8;border-radius:12px;padding:20px}

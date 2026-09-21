@@ -234,7 +234,7 @@ def make_server(directory, port=0, binary=None):
 def serve(directory, port=0, open_browser=True, binary=None):
     server = make_server(directory, port, binary)
     url = f'http://127.0.0.1:{server.server_port}/#token={server.app.token}'
-    print('TaskLean local dashboard\n' + url, flush=True)
+    print('Codex LeanTask local dashboard\n' + url, flush=True)
     print('Keep this terminal running. Ctrl+C stops the dashboard; let active turns finish first.', flush=True)
     if open_browser:
         webbrowser.open(url)
