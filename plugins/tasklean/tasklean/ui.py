@@ -222,7 +222,7 @@ def make_server(directory, port=0, binary=None):
                 self.reply(403, {'error': 'Cross-origin requests are forbidden'})
                 return False
             if api and not secrets.compare_digest(self.headers.get('X-TaskLean-Token', '').encode(), app.token.encode()):
-                self.reply(401, {'error': 'Open the launch URL printed by tasklean ui to connect'})
+                self.reply(401, {'error': 'This connection token is missing or expired. Open the latest launch URL from the running tasklean ui terminal. Earlier links expire when the launcher restarts.'})
                 return False
             return True
 
