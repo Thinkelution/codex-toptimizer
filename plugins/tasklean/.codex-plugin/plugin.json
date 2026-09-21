@@ -1,18 +1,18 @@
 {
   "name": "tasklean",
-  "version": "0.3.0-beta.3+codex.20260921101649",
+  "version": "0.3.0-beta.4+codex.20260921102239",
   "description": "Task-scoped SSH and dataset reuse, reviewable prompt optimization, and measured Codex usage.",
   "author": {
     "name": "Local developer"
   },
   "skills": "./skills/",
   "interface": {
-    "displayName": "TaskLean",
+    "displayName": "Codex LeanTask",
     "shortDescription": "Reuse task state and measure task efficiency.",
-    "longDescription": "Testable beta with a local browser dashboard, offline walkthrough, multi-turn Codex launcher, source and task-memory MCP tools, compact logs, reusable SSH connections and datasets. Usage is measured; savings are not guaranteed.",
+    "longDescription": "A companion plugin and local launcher for Codex. The launcher offers focused code reads, durable notes, compact logs and account-limit visibility. The plugin adds an audit skill and passive prompt metrics. Potential token savings are not yet proven.",
     "developerName": "Local developer",
     "category": "Productivity",
     "capabilities": [],
-    "defaultPrompt": "Audit this project for unnecessary context and explain what TaskLean can measure."
+    "defaultPrompt": "Use Codex LeanTask to audit this project\u2019s context and explain what can be measured."
   }
 }

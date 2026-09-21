@@ -43,7 +43,7 @@ def launch_action(a):
 
 def chat_action(a):
     from .launcher import launch
-    print('TaskLean beta. Enter a prompt; :status shows task state, :quit exits. Each prompt executes Codex using your login.')
+    print('Codex LeanTask beta. Enter a prompt; :status shows task state, :quit exits. Each prompt executes Codex using your login.')
     while True:
         try:
             prompt = input('You> ').strip()
@@ -65,7 +65,7 @@ def chat_action(a):
 
 
 def register(sub):
-    q = sub.add_parser('ui', help='Open the local TaskLean browser dashboard')
+    q = sub.add_parser('ui', help='Open the local Codex LeanTask browser dashboard')
     q.add_argument('--state-dir', default=str(Path.home() / '.local/share/tasklean/ui'))
     q.add_argument('--port', type=int, default=0, help='Loopback port; default chooses a free port')
     q.add_argument('--no-open', action='store_true')
@@ -110,7 +110,7 @@ def register(sub):
             q.add_argument('--offset', type=int, default=0)
             q.add_argument('--limit', type=int, default=4000)
     for action, func in [('launch', launch_action), ('chat', chat_action)]:
-        q = sub.add_parser(action, help='Continue one Codex task with scoped TaskLean MCP tools')
+        q = sub.add_parser(action, help='Continue one Codex task with scoped Codex LeanTask MCP tools')
         q.add_argument('--task-dir', required=True)
         q.add_argument('--codex-binary')
         q.add_argument('--model', help='Omit to use existing Codex settings')

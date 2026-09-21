@@ -1,2 +1,2 @@
-"""TaskLean: measure first; optimize explicitly."""
-__version__ = "0.3.0b3"
+"""Codex LeanTask: measure first; optimize explicitly."""
+__version__ = "0.3.0b4"

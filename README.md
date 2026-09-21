@@ -1,4 +1,4 @@
-# Codex TaskLean
+# Codex LeanTask
 
 **Website:** [codex-lean-task.thinkelution.com](https://codex-lean-task.thinkelution.com/) — setup guide and interactive preview.
 
@@ -6,7 +6,7 @@
 
 Task efficiency for Codex: reviewable prompt preparation, measured execution usage, reusable SSH connections, and task-scoped datasets held in server memory.
 
-The installable plugin lives in [`plugins/tasklean`](plugins/tasklean). Its package is called `tasklean`; the repository is `codex-toptimizer`.
+The installable plugin lives in [`plugins/tasklean`](plugins/tasklean). Its display name is **Codex LeanTask**. The package, CLI command and plugin ID remain `tasklean` for compatibility; the repository is `codex-toptimizer`. The [setup guide](plugins/tasklean/docs/beta.md) installs the launcher plus the companion plugin in separate explicit steps.
 
 ## Start here
 

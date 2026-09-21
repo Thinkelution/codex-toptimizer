@@ -1,4 +1,4 @@
-# TaskLean
+# Codex LeanTask
 
 **Browser UI:** after installing the package, run `tasklean ui` to create/import tasks, send follow-up prompts, and inspect account limits, usage and saved logs. See the [beta guide](docs/beta.md).
 
@@ -78,7 +78,7 @@ The original or prepared prompt goes through stdin, never shell interpolation. P
 
 1. Keep artifacts outside the measured repository. Prepare a prompt once.
 2. Run `--variant baseline` against a clean task checkout, using the original prompt.
-3. Run `--variant optimized` against a separate checkout with the same starting contents, model, reasoning, sandbox, and Codex version. Do not run the optimized task on changes made by the baseline. You create and manage these checkouts; TaskLean does not reset repositories.
+3. Run `--variant optimized` against a separate checkout with the same starting contents, model, reasoning, sandbox, and Codex version. Do not run the optimized task on changes made by the baseline. You create and manage these checkouts; Codex LeanTask does not reset repositories.
 4. Evaluate both against the same tests and acceptance criteria. A process exit code is not task success.
 5. Attach the human quality judgments, then compare:
 
@@ -102,11 +102,11 @@ For a benchmark, repeat representative tasks and count all failed attempts and r
 
 ## Codex plugin installation
 
-The scaffold is registered as **TaskLean** in the local personal marketplace at `~/.agents/plugins/marketplace.json`. Open it from the Codex plugin UI and install it. Availability in the personal marketplace is not installation or activation. Start a new task after installation for skill discovery.
+For a public installation, run `codex plugin marketplace add .` from the repository root, then `codex plugin add tasklean@codex-leantask`. This registers the repository source and installs the companion plugin. For existing local development, the personal marketplace entry at `~/.agents/plugins/marketplace.json` remains available. Availability in the personal marketplace is not installation or activation. Start a new task after installation for skill discovery.
 
 The hook must be reviewed and trusted in Codex before it runs. It uses `hooks/hooks.json` and the `PLUGIN_ROOT`/`PLUGIN_DATA` variables provided by Codex. It records only a timestamp, event name, prompt character count, rough token estimate, and large-prompt flag. It writes no prompt text, reads no transcript, adds no model context, and makes no network request. It keeps a bounded local log of roughly 1 MB. If `PLUGIN_DATA` is absent, the fallback is `~/.local/share/tasklean`.
 
-Ask Codex: **“Use TaskLean to audit this project's context and explain what can be measured.”** The skill runs only when relevant; it is not an invisible optimizer for all conversations.
+Ask Codex: **“Use Codex LeanTask to audit this project's context and explain what can be measured.”** The skill runs only when relevant; it is not an invisible optimizer for all conversations.
 
 ## Data and product boundaries
 
