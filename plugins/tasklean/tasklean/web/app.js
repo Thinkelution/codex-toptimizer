@@ -138,7 +138,7 @@ $('promptForm').onsubmit=async e=>{
   const task=selected, prompt=$('prompt').value;
   busy=true; $('run').disabled=true; $('deleteTask').disabled=true; $('error').hidden=true;
   try {
-    await api('/api/run',{task,prompt,model:$('model').value,reasoning:$('reasoning').value,sandbox:$('sandbox').value});
+    await api('/api/run',{task,prompt,model:$('model').value,reasoning:$('reasoning').value || modelCatalog.find(m => m.model === $('model').value)?.default_reasoning_effort || '',sandbox:$('sandbox').value});
     drafts.delete(task);
     if(selected===task) { $('prompt').value=''; await refresh(); }
   } catch(e) { error(e); if(selected===task) { busy=false; $('run').disabled=false; $('deleteTask').disabled=false; } }
@@ -223,3 +223,49 @@ $('feedbackForm').onsubmit = async event => {
   } catch(e) { $('feedbackStatus').textContent = e.message; }
   finally { $('sendFeedback').disabled = false; }
 };
+
+let modelCatalog = [], modelsLoading = false;
+function renderReasoning() {
+  const previous = $('reasoning').value;
+  const model = modelCatalog.find(m => m.model === $('model').value);
+  const fallback = element('option', model?.default_reasoning_effort ? `Model default (${model.default_reasoning_effort})` : 'Codex default');
+  fallback.value = '';
+  $('reasoning').replaceChildren(fallback);
+  for (const effort of model?.reasoning_efforts || []) {
+    const option = element('option', effort); option.value = effort; $('reasoning').append(option);
+  }
+  if (previous && [...$('reasoning').options].some(o => o.value === previous)) $('reasoning').value = previous;
+  $('model').title = model?.description || 'Use your configured Codex model';
+}
+async function loadModels(force = false) {
+  if (modelsLoading) return;
+  modelsLoading = true; $('refreshModels').disabled = true;
+  try {
+    const data = await api('/api/models' + (force ? '?refresh=1' : ''));
+    if (data.available) {
+      const previous = $('model').value;
+      modelCatalog = data.models;
+      const fallback = element('option', 'Codex default'); fallback.value = '';
+      $('model').replaceChildren(fallback);
+      for (const model of modelCatalog) {
+        const option = element('option', model.name); option.value = model.model; option.title = model.description;
+        $('model').append(option);
+      }
+      // Keep an explicitly selected model even if it disappears during a refresh.
+      if (previous && !modelCatalog.some(m => m.model === previous)) {
+        const missing = element('option', previous + ' (not in current catalog)'); missing.value = previous;
+        $('model').append(missing);
+      }
+      $('model').value = previous;
+      renderReasoning();
+    }
+    $('modelsStatus').textContent = data.error ? (data.available ? 'Showing last known models. ' : '') + data.error :
+      modelCatalog.length ? 'Models reported by your installed Codex. Reasoning options follow the selected model.' :
+      'Codex reported no models. You can still use your configured Codex default.';
+  } catch (_) {
+    $('modelsStatus').textContent = 'Could not refresh models. Your current selection is unchanged. Check the local connection and retry.';
+  } finally { modelsLoading = false; $('refreshModels').disabled = false; }
+}
+$('model').onchange = renderReasoning;
+$('refreshModels').onclick = () => loadModels(true);
+loadModels();

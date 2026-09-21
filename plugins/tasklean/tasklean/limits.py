@@ -48,7 +48,7 @@ def normalize(raw):
         result.append({'id': str(key)[:100], 'name': str(name)[:100], 'windows': windows})
     if not result or not any(b['windows'] for b in result):
         raise LimitsUnavailable()
-    return result
+    return sorted(result, key=lambda bucket: (bucket['id'] != 'codex', bucket['id'].casefold(), bucket['id']))
 
 
 class LimitsReader:
@@ -63,6 +63,9 @@ class LimitsReader:
         self.snapshot = None
         self.attempted = None
         self.error = None
+        self.model_snapshot = None
+        self.model_attempted = None
+        self.model_error = None
 
     def _stop(self):
         if self.selector:
@@ -124,7 +127,7 @@ class LimitsReader:
             self.buffer += chunk
         raise LimitsUnavailable()
 
-    def _read(self):
+    def _ensure_started(self):
         if not self.proc or self.proc.poll() is not None:
             self._stop()
             # Do not read auth files or return CLI diagnostics: Codex owns authentication.
@@ -135,7 +138,60 @@ class LimitsReader:
             self.selector.register(self.proc.stdout, selectors.EVENT_READ)
             self._request('initialize', {'clientInfo': {'name': 'tasklean_quota', 'title': 'Codex LeanTask account limits', 'version': '0.3.0'}})
             self._send({'method': 'initialized', 'params': {}})
+
+    def _read(self):
+        self._ensure_started()
         return normalize(self._request('account/rateLimits/read'))
+
+    def _read_models(self):
+        self._ensure_started()
+        models, seen, cursors = [], set(), set()
+        cursor = None
+        for _ in range(20):
+            params = {'limit': 100, 'includeHidden': False}
+            if cursor is not None:
+                params['cursor'] = cursor
+            page = self._request('model/list', params)
+            if not isinstance(page, dict) or not isinstance(page.get('data'), list):
+                raise LimitsUnavailable()
+            for item in page['data']:
+                if not isinstance(item, dict) or item.get('hidden'):
+                    continue
+                model = item.get('model')
+                if not isinstance(model, str) or not model or len(model) > 100 or model in seen:
+                    continue
+                seen.add(model)
+                efforts = []
+                for entry in item.get('supportedReasoningEfforts') or []:
+                    effort = entry.get('reasoningEffort') if isinstance(entry, dict) else None
+                    if effort in ('none', 'minimal', 'low', 'medium', 'high', 'xhigh', 'max', 'ultra') and effort not in efforts:
+                        efforts.append(effort)
+                default = item.get('defaultReasoningEffort')
+                models.append({'model': model, 'name': str(item.get('displayName') or model)[:100],
+                    'description': str(item.get('description') or '')[:1000],
+                    'reasoning_efforts': efforts,
+                    'default_reasoning_effort': default if default in efforts else None})
+            cursor = page.get('nextCursor')
+            if cursor is None:
+                return models
+            if not isinstance(cursor, str) or not cursor or cursor in cursors:
+                raise LimitsUnavailable()
+            cursors.add(cursor)
+        raise LimitsUnavailable()
+
+    def models(self, force=False):
+        with self.lock:
+            ttl = 5 if force else 300
+            if self.model_attempted is None or time.monotonic() - self.model_attempted >= ttl:
+                try:
+                    self.model_snapshot = {'models': self._read_models(), 'checked_at': time.time()}
+                    self.model_error = None
+                except (LimitsUnavailable, OSError, ValueError, subprocess.SubprocessError):
+                    self.model_error = 'Model list unavailable. Check your Codex CLI login and version, then refresh models. Codex default is still available.'
+                    self._stop()
+                self.model_attempted = time.monotonic()
+            return {'available': self.model_snapshot is not None, 'stale': bool(self.model_error),
+                'error': self.model_error, **(self.model_snapshot or {'models': [], 'checked_at': None})}
 
     def read(self, force=False):
         with self.lock:
