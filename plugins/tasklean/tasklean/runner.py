@@ -7,6 +7,7 @@ from pathlib import Path
 import signal
 import subprocess
 import time
+from .core import SECRET
 from .storage import private_write
 from .usage import codex_usage
 
@@ -46,6 +47,49 @@ def version(binary):
                                        timeout=5, text=True).strip()[:200] or None
     except (OSError, subprocess.SubprocessError):
         return None
+
+
+def failure_summary(out, result):
+    """Bounded diagnostics for private local UI, including older saved turns."""
+    state = result.get('execution_status')
+    if state == 'completed':
+        return None
+    def tail(name, size):
+        path = out / name
+        if path.is_symlink():
+            return ''
+        try:
+            with path.open('rb') as stream:
+                stream.seek(0, os.SEEK_END)
+                stream.seek(max(0, stream.tell() - size))
+                return stream.read(size).decode('utf-8', errors='replace').strip()
+        except OSError:
+            return ''
+    detail = ''
+    for line in tail('events.jsonl', 65536).splitlines():
+        try:
+            event = json.loads(line)
+        except ValueError:
+            continue
+        if not isinstance(event, dict) or event.get('type') not in ('error', 'turn.failed'):
+            continue
+        value = event.get('error') or event.get('message')
+        if isinstance(value, dict):
+            value = value.get('message')
+        if isinstance(value, str) and value.strip():
+            detail = value.strip()
+    detail = detail or tail('stderr.log', 8000)
+    if '--skip-git-repo-check was not specified' in detail:
+        summary = 'Codex could not start: this folder is not a trusted Git repository. Use Read only for research in an ordinary folder, or select a Git repository for project edits.'
+    elif state == 'timeout':
+        summary = 'The turn reached its time limit before finishing.'
+    elif state == 'interrupted':
+        summary = 'The turn was interrupted before finishing.'
+    elif state == 'launch_failed':
+        summary = 'Could not start the Codex executable. Check its installation and permissions.'
+    else:
+        summary = f"Codex failed (exit code {result.get('returncode', 'unknown')})."
+    return SECRET.sub('[redacted]', summary + ('\n\n' + detail if detail else ''))[:4000]
 
 
 def execute(argv, prompt, out, timeout):

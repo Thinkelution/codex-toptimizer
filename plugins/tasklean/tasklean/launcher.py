@@ -10,7 +10,7 @@ import subprocess
 import sys
 import time
 from .core import MAX_PROMPT_BYTES
-from .runner import execute, version
+from .runner import execute, version, failure_summary
 from .storage import private_write, write_json
 from .workspace import Workspace
 
@@ -40,7 +40,13 @@ def argv_for(work, binary, model=None, reasoning=None, sandbox='read-only'):
     args += ['exec', '--json', '--color', 'never']
     thread = work.get_meta('thread_id')
     if thread:
-        args += ['resume', thread]
+        args += ['resume']
+    # Research tasks can use ordinary folders while retaining the read-only sandbox.
+    # Editing tasks retain Codex's repository check.
+    if sandbox == 'read-only':
+        args += ['--skip-git-repo-check']
+    if thread:
+        args += [thread]
     return args + ['-']
 
 
@@ -96,6 +102,7 @@ def launch(directory, prompt, binary=None, model=None, reasoning=None, sandbox='
             private_write(out / 'prompt.txt', submitted)
             private_write(out / 'user_prompt.txt', prompt)
             result = execute(args, submitted, out, timeout)
+            result['error'] = failure_summary(out, result)
             thread, answer = parse_events((out / 'events.jsonl').read_text())
             if thread:
                 work.put_meta('thread_id', thread)

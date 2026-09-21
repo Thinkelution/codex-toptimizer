@@ -15,6 +15,7 @@ from tasklean import cli
 from tasklean.capture import capture
 from tasklean.demo import run_demo
 from tasklean.launcher import argv_for, launch
+from tasklean.runner import failure_summary
 from tasklean.mcp_server import dispatch, serve, TOOLS
 from tasklean.workspace import Workspace, initialize
 
@@ -200,12 +201,49 @@ class BetaTests(unittest.TestCase):
         self.assertFalse(result['global_config_changed'])
         self.assertFalse(any('bypass' in x for x in result['argv']))
 
+    def test_non_git_research_keeps_read_only_sandbox_and_editing_repo_check(self):
+        for sandbox in ('read-only', 'workspace-write'):
+            for thread in (None, 'fixture-thread'):
+                self.work.put_meta('thread_id', thread)
+                args = argv_for(self.work, 'codex', sandbox=sandbox)
+                self.assertEqual(args[args.index('--sandbox') + 1], sandbox)
+                self.assertEqual('--skip-git-repo-check' in args, sandbox == 'read-only')
+                self.assertEqual('resume' in args, bool(thread))
+                self.assertNotIn('--dangerously-bypass-approvals-and-sandbox', args)
+
+    def test_failure_diagnostics_use_structured_error_then_stderr_and_are_bounded(self):
+        out = self.root / 'failed'; out.mkdir()
+        record = {'execution_status': 'failed', 'returncode': 1}
+        (out / 'stderr.log').write_text('Not inside a trusted directory and --skip-git-repo-check was not specified.')
+        self.assertIn('Use Read only', failure_summary(out, record))
+        (out / 'events.jsonl').write_text(json.dumps({'type': 'turn.failed', 'error': {'message': 'Model unavailable'}}))
+        self.assertIn('Model unavailable', failure_summary(out, record))
+        self.assertNotIn('trusted directory', failure_summary(out, record))
+        (out / 'events.jsonl').write_text('')
+        (out / 'stderr.log').write_text('x' * 10000 + ' api_key=synthetic-secret-123456')
+        error = failure_summary(out, record)
+        self.assertLessEqual(len(error), 4000)
+        self.assertNotIn('synthetic-secret', error)
+        self.assertIn('time limit', failure_summary(out, {'execution_status': 'timeout'}))
+        self.assertIsNone(failure_summary(out, {'execution_status': 'completed'}))
+
+    def test_failed_launch_saves_error_for_cli_and_ui(self):
+        binary = self.root / 'failed-codex'
+        binary.write_text('#!' + sys.executable + "\nimport sys\nif '--version' in sys.argv: print('fixture'); sys.exit(0)\nsys.stderr.write('Not inside a trusted directory and --skip-git-repo-check was not specified.')\nsys.exit(1)\n")
+        binary.chmod(0o700)
+        result = launch(self.state, 'Explain', binary=str(binary), execute_turn=True)
+        self.assertEqual(result['execution_status'], 'failed')
+        self.assertIn('trusted Git repository', result['error'])
+        self.assertEqual(json.loads((Path(result['evidence_path']) / 'run.json').read_text())['error'], result['error'])
+
     def fake_codex(self):
         path = self.root / 'fake-codex'
         script = '''import sys,json
 if '--version' in sys.argv:
     print('synthetic-codex-1')
     raise SystemExit(0)
+assert '--skip-git-repo-check' in sys.argv
+assert sys.argv[sys.argv.index('--sandbox')+1] == 'read-only'
 prompt=sys.stdin.read()
 print(json.dumps({'type':'thread.started','thread_id':'00000000-0000-4000-8000-000000000001'}))
 print(json.dumps({'type':'item.completed','item':{'type':'agent_message','text':'RESUMED' if 'resume' in sys.argv else 'INITIAL'}}))
