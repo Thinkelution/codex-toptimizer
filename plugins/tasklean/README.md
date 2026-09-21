@@ -1,6 +1,6 @@
 # TaskLean
 
-**Browser UI:** after installing the package, run `tasklean ui` to create/import tasks, send follow-up prompts, and inspect usage and saved logs. See the [beta guide](docs/beta.md).
+**Browser UI:** after installing the package, run `tasklean ui` to create/import tasks, send follow-up prompts, and inspect account limits, usage and saved logs. See the [beta guide](docs/beta.md).
 
 **Start with the [0.3 beta guide](docs/beta.md)** for installation, the offline walkthrough, the multi-prompt launcher, code reads, task memory, compact logs and troubleshooting. The sections below cover the original prompt-preparation workflow.
 

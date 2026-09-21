@@ -24,7 +24,9 @@ async function refresh() {
   const d = await api('/api/detail', {task: current}); if (selected !== current) return;
   $('welcome').hidden = true; $('workspace').hidden = false; $('breadcrumb').textContent = 'Task';
   $('goal').textContent = d.status.goal; $('project').textContent = d.status.project; $('directory').textContent = d.directory;
-  busy = d.job.state === 'running'; $('run').disabled = busy; $('run').textContent = busy ? 'Codex is working…' : 'Run with Codex →';
+  const wasRunning = busy;
+  busy = d.job.state === 'running';
+  if(wasRunning && !busy) loadLimits(true); $('run').disabled = busy; $('run').textContent = busy ? 'Codex is working…' : 'Run with Codex →';
   $('runState').textContent = busy ? 'Running · ' + Math.floor((Date.now()/1000-d.job.started)) + 's' : (d.job.state || 'Ready');
   const usage = (d.report.model_turns || []);
   const rows = Array.isArray(usage) ? usage : [];
@@ -69,3 +71,64 @@ $('promptForm').onsubmit=async e=>{
 };
 (async()=>{try{await list();const d=await api('/api/doctor');$('connection').textContent=d.codex.available===false?'Demo ready · Codex missing':'Connected locally';if(selected)await refresh();}catch(e){$('connection').textContent='Disconnected';error(e);}})();
 setInterval(()=>{if(selected && !document.hidden) refresh().catch(error);},2500);
+
+let limitData=null, limitsLoading=false, limitsClockOffset=0;
+function windowLabel(window) {
+  const minutes=window.window_minutes;
+  if(minutes===10080)return 'Weekly';
+  if(minutes===300)return '5-hour';
+  if(minutes===1440)return 'Daily';
+  if(minutes && minutes%1440===0)return `${minutes/1440}-day`;
+  if(minutes && minutes%60===0)return `${minutes/60}-hour`;
+  return minutes ? `${minutes}-minute` : `${window.slot === 'primary' ? 'Primary' : 'Secondary'} window`;
+}
+function resetText(timestamp, now) {
+  if(timestamp===null)return 'Reset time unavailable';
+  const minutes=Math.ceil((timestamp*1000-now)/60000);
+  if(minutes<=0)return 'Reset time passed · awaiting fresh data';
+  const days=Math.floor(minutes/1440), hours=Math.floor(minutes%1440/60), mins=minutes%60;
+  return 'Resets in '+[days?`${days}d`:null,hours?`${hours}h`:null,mins?`${mins}m`:null].filter(Boolean).join(' ');
+}
+function renderLimits() {
+  if(!limitData)return;
+  const now=Date.now()+limitsClockOffset;
+  const host=$('limitWindows'); host.replaceChildren();
+  for(const bucket of limitData.buckets) for(const window of bucket.windows) {
+    const card=element('article','','limit-card'+(limitData.stale?' stale':''));
+    const name=bucket.id==='codex' ? 'Codex' : bucket.name;
+    card.append(element('span',`${name} · ${windowLabel(window)}`,'limit-label'));
+    const known=window.remaining_percent!==null;
+    card.append(element('strong',known?`${window.remaining_percent}% remaining`:'Unavailable'));
+    if(known) {
+      const progress=element('progress','');progress.max=100;progress.value=window.remaining_percent;
+      progress.setAttribute('aria-label',`${name} ${windowLabel(window)} limit remaining`);
+      if(window.remaining_percent<=10)progress.className='low';
+      card.append(progress);
+    }
+    const reset=element('p',resetText(window.resets_at,now),'limit-reset');
+    if(window.resets_at!==null) reset.title=new Date(window.resets_at*1000).toLocaleString();
+    card.append(reset);
+    if(window.resets_at!==null)card.append(element('small',new Date(window.resets_at*1000).toLocaleString()));
+    host.append(card);
+  }
+  const age=limitData.checked_at===null ? null : Math.max(0,Math.floor((now-limitData.checked_at*1000)/60000));
+  const updated=age===null ? '' : `Last checked ${age===0?'just now':age+'m ago'}. `;
+  $('limitsStatus').textContent=limitData.error ? `${limitData.available?'Stale — showing last known values. ':''}${updated}${limitData.error}` : `${updated}Refreshes every minute while this tab is visible. Only windows reported by Codex are shown.`;
+}
+async function loadLimits(force=false) {
+  if(limitsLoading)return;
+  limitsLoading=true; $('refreshLimits').disabled=true;
+  try {
+    limitData=await api('/api/limits'+(force?'?refresh=1':''));
+    limitsClockOffset=limitData.server_time*1000-Date.now();
+    renderLimits();
+  } catch(e) {
+    if(limitData) {limitData={...limitData,stale:true,error:'Could not refresh account limits. Reconnect to the local dashboard and retry.'};renderLimits();}
+    else $('limitsStatus').textContent='Account limits unavailable. Connect using the launch URL printed by tasklean ui.';
+  } finally {limitsLoading=false;$('refreshLimits').disabled=false;}
+}
+$('refreshLimits').onclick=()=>loadLimits(true);
+loadLimits();
+setInterval(()=>{if(!document.hidden)loadLimits();},60000);
+setInterval(()=>{if(!document.hidden)renderLimits();},15000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)loadLimits();});
