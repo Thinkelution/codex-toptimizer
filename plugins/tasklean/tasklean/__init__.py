@@ -1,0 +1,2 @@
+"""TaskLean: measure first; optimize explicitly."""
+__version__ = "0.3.0b2"
