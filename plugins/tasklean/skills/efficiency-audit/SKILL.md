@@ -7,6 +7,15 @@ description: Use for TaskLean efficiency audits, prompt optimization, Codex usag
 
 Use the bundled `scripts/tasklean.py` CLI relative to this plugin root.
 
+## Beta launcher and coding tools
+
+- Read `docs/beta.md` for the self-contained offline demo and launcher quickstart. `doctor` makes no model calls; `demo --out <new-directory>` creates only a generated fixture and runs scripted checks, with an HTML report.
+- For a coding task, `task init` binds a new private state directory outside the project to its root and goal. `launch` previews configuration; `launch --execute` or `chat` uses the user's existing Codex login and persists the returned conversation ID for later prompts. Keep the same task directory for continuity. Do not silently select a different model or strip the user's configuration.
+- The launcher provides five scoped MCP tools for status, source lookup, source reads, notes, and artifact retrieval. Exact symbol reads currently support Python; use line reads for other languages. Full content is the default. A delta needs both a matching receipt and an explicit assertion that the original text remains in context; after compaction, request full relevant content.
+- Use `task run --task-dir <state> -- <command>` through the normal host execution tool for already-authorized commands. It saves bounded raw logs and returns a compact result with an artifact handle. It does not bypass the host's approval or sandbox policy. No execution tool is exposed through MCP.
+- Keep concise requirements/decisions/observations in task notes. Source-backed observations become stale when the evidence file changes; notes never grant new authority. Don't treat an old successful command as a current test result or automatically skip required checks.
+- `task report` separates source/output character diagnostics from measured Codex usage. Report unknown usage honestly. The offline demo's scripted repair is not an AI benchmark; a live integration smoke test is not an A/B savings study.
+
 ## Repeated server or data work
 
 - When an authorized task involves repeated SSH commands, use one named `session start` for that task and target; then use `session exec` for subsequent commands. See `docs/sessions.md` for arguments. Reuse an existing session when it matches the task, host and dataset root. Do not change global SSH configuration or bypass host verification.

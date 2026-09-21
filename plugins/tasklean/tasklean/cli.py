@@ -144,6 +144,8 @@ def parser():
     s = p.add_subparsers(dest='cmd', required=True)
     from .sessions import register
     register(s)
+    from .beta_cli import register as register_beta
+    register_beta(s)
     q = s.add_parser('audit', help='Inventory repository instructions locally')
     q.add_argument('--project', default='.')
     q.set_defaults(func=lambda a: print(json.dumps(audit_project(a.project), indent=2)))

@@ -1,0 +1,79 @@
+{
+  "kind": "live_two_turn_integration_smoke",
+  "date": "2026-09-21",
+  "codex_version": "codex-cli 0.155.0-alpha.9.2",
+  "same_conversation_resumed": true,
+  "fixture": "Generated Python cart application; no production project changes.",
+  "steps": [
+    {
+      "step": 1,
+      "execution_status": "completed",
+      "resumed": false,
+      "elapsed_seconds": 52.689,
+      "execution_usage": {
+        "available": true,
+        "failed_event": false,
+        "turns": 1,
+        "input_tokens": 112051,
+        "cached_input_tokens": 91136,
+        "output_tokens": 685,
+        "total_tokens": 112736,
+        "uncached_input_tokens": 20915
+      }
+    },
+    {
+      "step": 2,
+      "execution_status": "completed",
+      "resumed": true,
+      "elapsed_seconds": 40.01,
+      "execution_usage": {
+        "available": true,
+        "failed_event": false,
+        "turns": 1,
+        "input_tokens": 196441,
+        "cached_input_tokens": 173056,
+        "output_tokens": 1411,
+        "total_tokens": 197852,
+        "uncached_input_tokens": 23385
+      }
+    }
+  ],
+  "acceptance": {
+    "quantity_respected": true,
+    "default_quantity_one": true,
+    "empty_cart_zero": true,
+    "zero_quantity_zero": true,
+    "negative_quantity_raises": true,
+    "five_regression_tests_pass": true,
+    "independent_acceptance_checks_pass": true
+  },
+  "operation_diagnostics": [
+    {
+      "operation": "command",
+      "calls": 2,
+      "source_chars": 700,
+      "returned_chars": 1832
+    },
+    {
+      "operation": "find",
+      "calls": 1,
+      "source_chars": 0,
+      "returned_chars": 324
+    },
+    {
+      "operation": "read",
+      "calls": 3,
+      "source_chars": 30199,
+      "returned_chars": 1316
+    }
+  ],
+  "savings_claim": null,
+  "limitations": [
+    "No unoptimized baseline; this is not evidence of net token or cost savings.",
+    "Uses existing Codex configuration and its context/tool overhead. Model identity not resolved beyond configured default.",
+    "Source-character counts are references, not tokens saved. Small command receipts can be larger than raw short logs.",
+    "The launcher records failures and usage; passing this fixture does not establish general task quality."
+  ],
+  "total_tokens": 310588,
+  "cached_input_tokens": 264192
+}

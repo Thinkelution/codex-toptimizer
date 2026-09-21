@@ -1,10 +1,12 @@
 # TaskLean
 
+**Start with the [0.3 beta guide](docs/beta.md)** for installation, the offline walkthrough, the multi-prompt launcher, code reads, task memory, compact logs and troubleshooting. The sections below cover the original prompt-preparation workflow.
+
 A local Codex efficiency prototype: inspect instruction size, prepare a reviewable prompt, and compare recorded task usage including the optimizer's overhead.
 
 Version 0.2 also adds [reusable SSH sessions and in-memory datasets](docs/sessions.md). For repeated server/data work, start a named task session, load a dataset once, and query bounded summaries across prompts. The session layer has been tested on the supplied Linux server; prompt-optimization savings still require model benchmarks.
 
-**Status:** local prototype. No real-model savings benchmark has been run. Model rewriting has been tested with mocked API responses; the execution path has been tested with local subprocess fixtures. It is not yet a validated commercial product.
+**Status:** local/SSH beta. The new launcher has passed a real two-prompt coding smoke test; there is no real-model A/B savings benchmark yet. The optional API prompt rewriter is tested with mocked responses. This is not yet a validated commercial product.
 
 ## What works
 
