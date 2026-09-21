@@ -22,6 +22,44 @@ class LimitsTests(unittest.TestCase):
         self.assertEqual(buckets[0]['windows'][0]['window_minutes'],10080)
         self.assertEqual(buckets[1]['windows'][0]['window_minutes'],300)
 
+    def test_bucket_order_is_stable_when_server_order_changes(self):
+        buckets = {'gpt-reserve': {'primary': window(0)}, 'codex': {'primary': window(25)},
+                   'another': {'primary': window(50)}}
+        first = normalize({'rateLimitsByLimitId': buckets})
+        second = normalize({'rateLimitsByLimitId': dict(reversed(list(buckets.items())))})
+        self.assertEqual(first, second)
+        self.assertEqual(first[0]['id'], 'codex')
+
+    def test_model_catalog_paginates_filters_and_reuses_quota_connection(self):
+        reader = LimitsReader(); self.addCleanup(reader.close)
+        model = {'model': 'example', 'displayName': 'Example',
+                 'supportedReasoningEfforts': [{'reasoningEffort': 'low'}, {'reasoningEffort': 'ultra'}],
+                 'defaultReasoningEffort': 'low', 'privateExtra': 'SECRET'}
+        pages = [{'data': [model, {'model': 'hidden', 'hidden': True}], 'nextCursor': 'page2'},
+                 {'data': [model, {'model': 'second'}], 'nextCursor': None}]
+        with patch.object(reader, '_ensure_started') as start, patch.object(reader, '_request', side_effect=pages) as request:
+            result = reader.models()
+            self.assertTrue(result['available'])
+            self.assertEqual([m['model'] for m in result['models']], ['example', 'second'])
+            self.assertEqual(result['models'][0]['reasoning_efforts'], ['low', 'ultra'])
+            self.assertNotIn('SECRET', json.dumps(result))
+            self.assertEqual(request.call_args.args, ('model/list', {'limit': 100, 'includeHidden': False, 'cursor': 'page2'}))
+            reader.models(); reader.models(force=True)
+            self.assertEqual(request.call_count, 2)
+            start.assert_called_once()
+        reader.model_attempted = None
+        with patch.object(reader, '_read_models', side_effect=LimitsUnavailable('SECRET')):
+            stale = reader.models()
+            self.assertTrue(stale['stale'])
+            self.assertEqual(stale['models'], result['models'])
+            self.assertNotIn('SECRET', json.dumps(stale))
+
+    def test_model_catalog_repeated_cursor_and_bad_response_are_unavailable(self):
+        for page in ({'data': [], 'nextCursor': 'same'}, {'data': None}):
+            reader = LimitsReader(); self.addCleanup(reader.close)
+            with patch.object(reader, '_ensure_started'), patch.object(reader, '_request', return_value=page):
+                self.assertFalse(reader.models()['available'])
+
     def test_legacy_null_unknown_and_clamp(self):
         buckets=normalize({'rateLimits':{'primary':window(120),'secondary':window(None,None,None)}})
         self.assertEqual(buckets[0]['windows'][0]['remaining_percent'],0)
@@ -71,6 +109,9 @@ for line in sys.stdin:
   assert not initialized
   print(json.dumps({'id':r['id'],'result':{}}),flush=True)
  elif method=='initialized': initialized=True
+ elif method=='model/list':
+  assert initialized
+  print(json.dumps({'id':r['id'],'result':{'data':[{'model':'example'}],'nextCursor':None}}),flush=True)
  elif method=='account/rateLimits/read':
   assert initialized
   print(json.dumps({'method':'account/rateLimits/updated','params':{}}),flush=True)
@@ -80,6 +121,8 @@ for line in sys.stdin:
         reader=LimitsReader(binary,timeout=1);self.addCleanup(reader.close)
         first=reader.read();self.assertTrue(first['available'])
         pid=reader.proc.pid
+        self.assertEqual(reader.models()['models'][0]['model'], 'example')
+        self.assertEqual(reader.proc.pid, pid)
         reader.attempted=None
         again=reader.read()
         self.assertEqual(reader.proc.pid,pid)

@@ -65,6 +65,16 @@ class DashboardTests(unittest.TestCase):
             self.assertEqual(self.request('/api/limits?refresh=1')[0],200)
             read.assert_called_with(force=True)
 
+    def test_model_catalog_requires_auth_and_supports_refresh(self):
+        snapshot = {'available': True, 'models': [{'model': 'example'}]}
+        with patch.object(self.server.app.limits, 'models', return_value=snapshot) as models:
+            self.assertEqual(self.request('/api/models', token=False)[0], 401)
+            models.assert_not_called()
+            self.assertEqual(self.request('/api/models'), (200, snapshot))
+            models.assert_called_with(force=False)
+            self.assertEqual(self.request('/api/models?refresh=1')[0], 200)
+            models.assert_called_with(force=True)
+
     def test_assets_packaged_and_no_token_in_html(self):
         for path in ('/', '/app.js', '/style.css', '/icon.svg'):
             status, body = self.request(path, token=False)
@@ -207,6 +217,8 @@ class DashboardTests(unittest.TestCase):
         fake.write_text('#!' + sys.executable + '\n' + """import json, sys
 if '--version' in sys.argv:
     print('fixture-codex'); raise SystemExit(0)
+assert sys.argv[sys.argv.index('--model')+1] == 'example-model'
+assert 'model_reasoning_effort="ultra"' in sys.argv
 sys.stdin.read()
 print(json.dumps({'type':'thread.started','thread_id':'fixture-thread'}))
 print(json.dumps({'type':'item.completed','item':{'type':'agent_message','text':'resumed' if 'resume' in sys.argv else 'first'}}))
@@ -216,7 +228,7 @@ print(json.dumps({'type':'turn.completed','usage':{'input_tokens':10,'cached_inp
         self.server.app.binary = str(fake)
         task = self.create()
         for prompt, answer in [('review', 'first'), ('continue', 'resumed')]:
-            status, result = self.request('/api/run', {'task': task, 'prompt': prompt})
+            status, result = self.request('/api/run', {'task': task, 'prompt': prompt, 'model': 'example-model', 'reasoning': 'ultra'})
             self.assertEqual(status, 200, result)
             for _ in range(200):
                 detail = self.server.app.detail(task)

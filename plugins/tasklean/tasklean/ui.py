@@ -129,7 +129,7 @@ class Dashboard:
             raise ValueError('Enter a prompt up to 128 KB')
         if model is not None and (not isinstance(model, str) or len(model) > 100):
             raise ValueError('Invalid model')
-        if reasoning not in (None, 'low', 'medium', 'high', 'xhigh') or sandbox not in ('read-only', 'workspace-write'):
+        if reasoning not in (None, 'none', 'minimal', 'low', 'medium', 'high', 'xhigh', 'max', 'ultra') or sandbox not in ('read-only', 'workspace-write'):
             raise ValueError('Invalid reasoning or sandbox')
         args = dict(binary=self.binary, model=model, reasoning=reasoning, sandbox=sandbox, timeout=600)
         # Validate prerequisites synchronously before accepting a background turn.
@@ -234,6 +234,8 @@ def make_server(directory, port=0, binary=None):
                 self.reply(200, app.listing())
             elif route == '/api/limits':
                 self.reply(200, app.limits.read(force=urlsplit(self.path).query == 'refresh=1'))
+            elif route == '/api/models':
+                self.reply(200, app.limits.models(force=urlsplit(self.path).query == 'refresh=1'))
             elif route == '/api/doctor':
                 self.reply(200, doctor(app.binary))
             elif route in ('/', '/app.js', '/style.css', '/icon.svg'):
