@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tasklean"
-version = "0.3.0b2"
+version = "0.3.0b3"
 description = "TaskLean beta: persistent Codex tasks, focused code reads and compact tool output"
 requires-python = ">=3.11"
 dependencies = []

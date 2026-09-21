@@ -45,6 +45,16 @@ class DashboardTests(unittest.TestCase):
         self.assertEqual(status, 200, data)
         return data['task']
 
+    def test_account_limits_endpoint_requires_auth_and_supports_refresh(self):
+        snapshot={'available':False,'buckets':[],'checked_at':None}
+        with patch.object(self.server.app.limits,'read',return_value=snapshot) as read:
+            self.assertEqual(self.request('/api/limits',token=False)[0],401)
+            read.assert_not_called()
+            self.assertEqual(self.request('/api/limits'),(200,snapshot))
+            read.assert_called_with(force=False)
+            self.assertEqual(self.request('/api/limits?refresh=1')[0],200)
+            read.assert_called_with(force=True)
+
     def test_assets_packaged_and_no_token_in_html(self):
         for path in ('/', '/app.js', '/style.css'):
             status, body = self.request(path, token=False)

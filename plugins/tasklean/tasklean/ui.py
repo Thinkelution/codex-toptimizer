@@ -11,6 +11,7 @@ from pathlib import Path
 from urllib.parse import urlsplit
 
 from .launcher import doctor, launch
+from .limits import LimitsReader
 from .storage import write_json
 from .workspace import Workspace, initialize
 
@@ -25,6 +26,7 @@ class Dashboard:
         self.token = secrets.token_urlsafe(32)
         self.lock = threading.RLock()
         self.jobs = {}
+        self.limits = LimitsReader(binary)
 
     def path(self, task):
         with self.lock:
@@ -185,6 +187,8 @@ def make_server(directory, port=0, binary=None):
                 return
             if route == '/api/tasks':
                 self.reply(200, app.listing())
+            elif route == '/api/limits':
+                self.reply(200, app.limits.read(force=urlsplit(self.path).query == 'refresh=1'))
             elif route == '/api/doctor':
                 self.reply(200, doctor(app.binary))
             elif route in ('/', '/app.js', '/style.css'):
@@ -217,7 +221,12 @@ def make_server(directory, port=0, binary=None):
             super().setup()
             self.connection.settimeout(15)
 
-    server = ThreadingHTTPServer(('127.0.0.1', port), Handler)
+    class Server(ThreadingHTTPServer):
+        def server_close(self):
+            super().server_close()
+            app.limits.close()
+
+    server = Server(('127.0.0.1', port), Handler)
     server.app = app
     return server
 
