@@ -89,6 +89,64 @@ class DashboardTests(unittest.TestCase):
         self.assertEqual(path.stat().st_mode & 0o777, 0o700)
         self.assertEqual(restored.registry.stat().st_mode & 0o777, 0o600)
 
+    def test_project_groups_use_full_paths_and_reuse_existing_projects(self):
+        one, two = self.create(), self.create()
+        other = self.root / 'another' / 'project'
+        other.mkdir(parents=True)
+        status, data = self.request('/api/tasks', {'project': str(other), 'goal': 'Another project'})
+        self.assertEqual(status, 200)
+        listing = self.request('/api/tasks')[1]
+        self.assertEqual(len(listing['projects']), 2)
+        groups = {p['path']: p['tasks'] for p in listing['projects']}
+        self.assertEqual({t['id'] for t in groups[str(self.project.resolve())]}, {one, two})
+        self.assertEqual(groups[str(other.resolve())][0]['id'], data['task'])
+
+    def test_delete_restore_persists_and_preserves_all_files(self):
+        task = self.create()
+        path = self.server.app.path(task)
+        source = self.project / 'app.py'
+        source.write_text('valuable project code')
+        with Workspace(path) as work:
+            work.put_meta('keep_me', 'saved context')
+        config = (path / 'task.json').read_bytes()
+        self.assertEqual(self.request('/api/delete', {'task': task}, token=False)[0], 401)
+        self.assertEqual(self.request('/api/delete', {'task': task})[0], 200)
+        listing = self.request('/api/tasks')[1]
+        self.assertEqual(listing['tasks'], [])
+        self.assertEqual(listing['projects'], [])
+        self.assertEqual(listing['deleted'][0]['id'], task)
+        self.assertEqual(self.request('/api/detail', {'task': task})[0], 400)
+        restarted = Dashboard(self.root / 'ui')
+        self.assertEqual(restarted.listing()['deleted'][0]['id'], task)
+        self.assertEqual(restarted.trash_file.stat().st_mode & 0o777, 0o600)
+        restarted.action('/api/restore', {'task': task})
+        self.assertEqual(restarted.path(task), path)
+        self.assertEqual(restarted.listing()['deleted'], [])
+        self.assertEqual(source.read_text(), 'valuable project code')
+        self.assertEqual((path / 'task.json').read_bytes(), config)
+        with Workspace(path) as work:
+            self.assertEqual(work.get_meta('keep_me'), 'saved context')
+
+    def test_restore_endpoint_and_import_restore_deleted_task(self):
+        task = self.create()
+        path = self.server.app.path(task)
+        for method in ('restore', 'import'):
+            self.assertEqual(self.request('/api/delete', {'task': task})[0], 200)
+            route, data = ('/api/restore', {'task': task}) if method == 'restore' else ('/api/import', {'directory': str(path)})
+            self.assertEqual(self.request(route, data)[0], 200)
+            self.assertEqual(self.request('/api/tasks')[1]['deleted'], [])
+        self.assertEqual(self.request('/api/delete', {'task': 'unknown'})[0], 400)
+        self.assertEqual(self.request('/api/restore', {'task': task})[0], 400)
+
+    def test_deleted_task_cannot_start_when_deleted_during_validation(self):
+        task = self.create()
+        def fake(*args, **kwargs):
+            self.server.app.set_deleted(task)
+        with patch('tasklean.ui.launch', side_effect=fake) as launch:
+            self.assertEqual(self.request('/api/run', {'task': task, 'prompt': 'review'})[0], 400)
+            self.assertEqual(launch.call_count, 1)
+        self.assertNotIn(task, self.server.app.jobs)
+
     def test_invalid_inputs_and_artifact_traversal(self):
         task = self.create()
         for route, data in [('/api/tasks', {'project': [], 'goal': 'x'}), ('/api/detail', {'task': '../other'}),
@@ -111,6 +169,8 @@ class DashboardTests(unittest.TestCase):
             self.assertTrue(entered.wait(2))
             self.assertEqual(self.request('/api/run', {'task': task, 'prompt': 'duplicate'})[0], 400)
             self.assertEqual(self.server.app.detail(task)['job']['state'], 'running')
+            self.assertEqual(self.request('/api/delete', {'task': task})[0], 400)
+            self.assertEqual(self.request('/api/tasks')[1]['deleted'], [])
             release.set()
             for _ in range(100):
                 if self.server.app.detail(task)['job']['state'] != 'running':

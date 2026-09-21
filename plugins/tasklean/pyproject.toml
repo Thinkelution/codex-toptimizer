@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tasklean"
-version = "0.3.0b4"
+version = "0.3.0b5"
 description = "Codex LeanTask beta: persistent Codex tasks, focused code reads and compact tool output"
 requires-python = ">=3.11"
 dependencies = []

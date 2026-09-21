@@ -12,20 +12,72 @@ async function api(path, data) {
   return result;
 }
 function element(tag, text, className) { const el = document.createElement(tag); el.textContent = text; if (className) el.className = className; return el; }
+let projects = [], deletedTasks = [], deletingTask = null;
+const collapsedProjects = new Set();
+function home() {
+  selected = null; busy = false; rendered = '';
+  sessionStorage.removeItem('tasklean-selected');
+  $('welcome').hidden = false; $('workspace').hidden = true; $('breadcrumb').textContent = 'Overview';
+}
+function renderDeleted() {
+  $('deletedTasks').replaceChildren();
+  if (!deletedTasks.length) $('deletedTasks').append(element('p', 'No deleted tasks.', 'empty'));
+  for (const task of deletedTasks) {
+    const row = element('article', '', 'deleted-row'), info = element('div', '');
+    info.append(element('strong', task.goal), element('p', task.project, 'mono'));
+    const restore = element('button', 'Restore');
+    restore.setAttribute('aria-label', 'Restore ' + task.goal);
+    restore.onclick = async () => {
+      restore.disabled = true;
+      try { await api('/api/restore', {task: task.id}); await list(); }
+      catch(e) { $('deletedDialog').close(); error(e); }
+      finally { restore.disabled = false; }
+    };
+    row.append(info, restore); $('deletedTasks').append(row);
+  }
+}
 async function list() {
-  const data = await api('/api/tasks'); $('tasks').replaceChildren();
-  for (const task of data.tasks) { const b = element('button', task.goal, selected === task.id ? 'active' : ''); b.title = task.project; b.onclick = () => choose(task.id); $('tasks').append(b); }
-  if (selected && !data.tasks.some(t => t.id === selected)) selected = null;
+  const data = await api('/api/tasks');
+  projects = data.projects; deletedTasks = data.deleted;
+  if (selected && !data.tasks.some(t => t.id === selected)) home();
+  $('tasks').replaceChildren(); $('knownProjects').replaceChildren();
+  for (const project of projects) {
+    const option = element('option', project.name); option.value = project.path; $('knownProjects').append(option);
+    const group = element('details', '', 'project-group');
+    group.open = !collapsedProjects.has(project.path);
+    group.ontoggle = () => group.open ? collapsedProjects.delete(project.path) : collapsedProjects.add(project.path);
+    const summary = element('summary', '', 'project-summary'); summary.title = project.path;
+    summary.append(element('span', project.name, 'project-name'), element('span', String(project.tasks.length), 'project-count'));
+    const path = element('small', project.path, 'project-path'); path.title = project.path;
+    const add = element('button', '+ New task', 'project-add');
+    add.setAttribute('aria-label', 'New task in ' + project.path);
+    add.onclick = () => openCreate(project.path);
+    group.append(summary, path);
+    for (const task of project.tasks) {
+      const b = element('button', task.goal, selected === task.id ? 'active' : '');
+      b.title = task.goal; b.onclick = () => choose(task.id).catch(error); group.append(b);
+    }
+    group.append(add); $('tasks').append(group);
+  }
+  if (!projects.length) $('tasks').append(element('p', 'Create a task to add your first project.', 'empty'));
+  $('showDeleted').textContent = 'Recently deleted' + (deletedTasks.length ? ` (${deletedTasks.length})` : '');
+  renderDeleted();
+}
+function openCreate(project) {
+  $('projectPath').value = project || (selected ? $('project').textContent : '');
+  $('taskGoal').value = ''; $('createDialog').showModal();
 }
 async function choose(id) { if (selected) drafts.set(selected, $('prompt').value); $('prompt').value = drafts.get(id) || ''; selected = id; sessionStorage.setItem('tasklean-selected', id); $('error').hidden = true; await list(); await refresh(); }
 async function refresh() {
   if (!selected) return;
   const current = selected;
-  const d = await api('/api/detail', {task: current}); if (selected !== current) return;
-  $('welcome').hidden = true; $('workspace').hidden = false; $('breadcrumb').textContent = 'Task';
+  let d;
+  try { d = await api('/api/detail', {task: current}); } catch(e) { if(selected === current) throw e; return; }
+  if (selected !== current) return;
+  $('welcome').hidden = true; $('workspace').hidden = false; $('breadcrumb').textContent = d.status.project.split('/').filter(Boolean).pop() + ' / Task';
   $('goal').textContent = d.status.goal; $('project').textContent = d.status.project; $('directory').textContent = d.directory;
   const wasRunning = busy;
-  busy = d.job.state === 'running';
+  busy = d.job.state === 'running'; $('deleteTask').disabled = busy;
   if(wasRunning && !busy) loadLimits(true); $('run').disabled = busy; $('run').textContent = busy ? 'Codex is working…' : 'Run with Codex →';
   $('runState').textContent = busy ? 'Running · ' + Math.floor((Date.now()/1000-d.job.started)) + 's' : (d.job.state || 'Ready');
   const usage = (d.report.model_turns || []);
@@ -52,8 +104,16 @@ async function refresh() {
 async function showLog(id) { logHandle=id; logOffset=0; $('logText').textContent=''; $('logDialog').showModal(); await moreLog(); }
 async function moreLog() { try { const r=await api('/api/artifact',{task:selected,id:logHandle,offset:logOffset}); $('logText').textContent+=r.text; logOffset=r.next_offset; $('moreLog').hidden=!r.more; } catch(e) { $('logDialog').close(); error(e); } }
 $('moreLog').onclick=moreLog;
-$('home').onclick=async e=>{e.preventDefault();if(selected) drafts.set(selected,$('prompt').value);selected=null;sessionStorage.removeItem('tasklean-selected');$('welcome').hidden=false;$('workspace').hidden=true;$('breadcrumb').textContent='Overview';await list();};
-for (const id of ['newTask','startTask']) $(id).onclick=()=>$('createDialog').showModal();
+$('home').onclick=async e=>{e.preventDefault();if(selected) drafts.set(selected,$('prompt').value);home();await list();};
+for (const id of ['newTask','startTask']) $(id).onclick=()=>openCreate();
+$('showDeleted').onclick=async()=>{try{await list();$('deletedDialog').showModal();}catch(e){error(e);}};
+$('deleteTask').onclick=()=>{if(busy || !selected)return;deletingTask=selected;$('deleteGoal').textContent=$('goal').textContent;$('deleteDialog').showModal();};
+$('confirmDelete').onclick=async()=>{
+  const task=deletingTask; $('confirmDelete').disabled=true;
+  try { await api('/api/delete',{task}); drafts.delete(task); if(selected===task)home(); $('deleteDialog').close(); await list(); }
+  catch(e){$('deleteDialog').close();error(e);}
+  finally{$('confirmDelete').disabled=false;deletingTask=null;}
+};
 $('importTask').onclick=()=>$('importDialog').showModal();
 for (const b of document.querySelectorAll('[data-close]')) b.onclick=()=>b.closest('dialog').close();
 $('createForm').onsubmit=async e=>{e.preventDefault(); try { const r=await api('/api/tasks',{project:$('projectPath').value,goal:$('taskGoal').value}); $('createDialog').close(); await choose(r.task); } catch(e){$('createDialog').close();error(e);} };
@@ -62,12 +122,12 @@ $('demo').onclick=async()=>{ $('demo').disabled=true; $('demo').textContent='Run
 $('promptForm').onsubmit=async e=>{
   e.preventDefault(); if(busy)return;
   const task=selected, prompt=$('prompt').value;
-  busy=true; $('run').disabled=true; $('error').hidden=true;
+  busy=true; $('run').disabled=true; $('deleteTask').disabled=true; $('error').hidden=true;
   try {
     await api('/api/run',{task,prompt,model:$('model').value,reasoning:$('reasoning').value,sandbox:$('sandbox').value});
     drafts.delete(task);
     if(selected===task) { $('prompt').value=''; await refresh(); }
-  } catch(e) { error(e); if(selected===task) { busy=false; $('run').disabled=false; } }
+  } catch(e) { error(e); if(selected===task) { busy=false; $('run').disabled=false; $('deleteTask').disabled=false; } }
 };
 (async()=>{try{await list();const d=await api('/api/doctor');$('connection').textContent=d.codex.available===false?'Demo ready · Codex missing':'Connected locally';if(selected)await refresh();}catch(e){$('connection').textContent='Disconnected';error(e);}})();
 setInterval(()=>{if(selected && !document.hidden) refresh().catch(error);},2500);
