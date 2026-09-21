@@ -65,6 +65,15 @@ def chat_action(a):
 
 
 def register(sub):
+    q = sub.add_parser('ui', help='Open the local TaskLean browser dashboard')
+    q.add_argument('--state-dir', default=str(Path.home() / '.local/share/tasklean/ui'))
+    q.add_argument('--port', type=int, default=0, help='Loopback port; default chooses a free port')
+    q.add_argument('--no-open', action='store_true')
+    q.add_argument('--codex-binary')
+    def ui(a):
+        from .ui import serve
+        serve(a.state_dir, a.port, not a.no_open, a.codex_binary)
+    q.set_defaults(func=ui)
     p = sub.add_parser('task', help='Versioned code reads, durable notes and compact command results')
     actions = p.add_subparsers(dest='action', required=True)
     init = actions.add_parser('init')

@@ -1,6 +1,6 @@
 # TaskLean 0.3 beta: try it yourself
 
-The beta is a local CLI launcher plus a Codex plugin. It supports a reproducible offline demo and real multi-prompt Codex tasks. It does not require a hosted TaskLean service. macOS/Linux, Python 3.11+, and Git are required. Real model turns additionally require an installed, authenticated Codex CLI.
+The beta includes a local browser dashboard, CLI launcher and Codex plugin. It supports a reproducible offline demo and real multi-prompt Codex tasks. It does not require a hosted TaskLean service. macOS/Linux, Python 3.11+, and Git are required. Real model turns additionally require an installed, authenticated Codex CLI.
 
 ## 1. Install the beta
 
@@ -17,7 +17,24 @@ tasklean doctor
 
 No global Codex configuration is changed by installation or the launcher. There are no runtime Python dependencies. Package building uses setuptools. You can also run `python3 plugins/tasklean/scripts/tasklean.py` instead of installing the command.
 
-## 2. Run the offline walkthrough
+## 2. Open the browser dashboard
+
+```bash
+tasklean ui
+```
+
+This starts a local server on a free loopback port and opens your browser. Keep the terminal running. Create a task by entering an existing project folder and a goal, or **Import existing task** by entering a folder containing `task.json`. The default UI state lives under `~/.local/share/tasklean/ui`, separate from your source. Use `--state-dir PATH` for another private state location, `--port 8785` for a fixed port, or `--no-open` to print the launch URL without opening a browser.
+
+- **Try the offline demo** creates a disposable example with saved test logs and a stale-evidence note. No inference is involved.
+- **Run with Codex** sends your prompt through the existing launcher and your Codex account. Follow-up prompts resume the same saved conversation. Read-only is the default; choose **Allow project edits** for coding work.
+- The dashboard shows running status and elapsed time, then the completed answer and reported usage. It does not stream individual model/tool events or support cancellation yet. Each turn has a ten-minute timeout.
+- Task memory shows the latest eight notes. The latest 30 turn answers and 20 command receipts are shown; older records remain in the task directory. Prompts from older CLI releases may not appear, but their saved answers do.
+- Command logs can be opened and paged through. Actual input, cached input and output token counts are shown separately; cached input is already included in input. Missing usage is not treated as zero or savings.
+- Closing the browser does not stop a running turn. Let turns finish before stopping the launcher. Ctrl+C closes the dashboard; accepted turns finish within their timeout before the process exits.
+
+The server binds only to `127.0.0.1`. Its launch URL contains a per-process access token in the URL fragment, removed from the address bar after loading and retained only in that tab's session storage. API requests require that token, the exact local host and a same-origin request when an Origin header is present. No CORS access, telemetry upload, public hosting, credential sharing, or global Codex configuration changes are enabled. Do not publish or reverse-proxy this local beta. It is a single-user tool, not a multi-user web service. Restarting the server generates a new token; use the newly printed launch URL to reconnect.
+
+### CLI alternative: run the offline walkthrough
 
 ```bash
 tasklean demo --out /tmp/tasklean-demo-01
@@ -123,6 +140,7 @@ The [first real two-prompt smoke test](beta-live-smoke-2026-09-21.json) resumed 
 
 | Capability | Status |
 | --- | --- |
+| Local browser dashboard | Implemented; offline browser walkthrough, imported live history, HTTP/subprocess integration tests |
 | Multi-prompt Codex launcher and chat loop | Implemented and live-tested |
 | Focused Python symbols and general line reads | Implemented; indexed lookup is bounded |
 | Durable notes with source freshness | Implemented |

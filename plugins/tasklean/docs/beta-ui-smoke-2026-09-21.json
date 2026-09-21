@@ -1,0 +1,22 @@
+{
+  "version": "0.3.0b2",
+  "date": "2026-09-21",
+  "platform": "macOS",
+  "validation": {
+    "unit_and_integration_tests": 87,
+    "ui_tests": 9,
+    "installed_package_static_assets": "passed",
+    "plugin_manifest_validation": "passed"
+  },
+  "browser_checks": [
+    "Dashboard loads and displays local connection status",
+    "Offline demo creates a task, stale-evidence note and inspectable test logs",
+    "Import of earlier live-model task displays two completed answers and reported usage",
+    "Task creation through browser form",
+    "First prompt through browser runs synthetic Codex subprocess and displays answer",
+    "Second browser prompt resumes the same synthetic thread and displays cumulative usage"
+  ],
+  "new_model_inference": false,
+  "usage_note": "Synthetic subprocess usage is fixture data, not actual inference. Imported live usage comes from the separate beta-live-smoke record. No savings comparison was performed.",
+  "scope": "Local loopback browser UI only; no public service deployed."
+}

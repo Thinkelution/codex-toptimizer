@@ -1,6 +1,6 @@
 {
   "name": "tasklean",
-  "version": "0.3.0-beta.1+codex.20260921092144",
+  "version": "0.3.0-beta.2+codex.20260921094938",
   "description": "Task-scoped SSH and dataset reuse, reviewable prompt optimization, and measured Codex usage.",
   "author": {
     "name": "Local developer"
@@ -9,7 +9,7 @@
   "interface": {
     "displayName": "TaskLean",
     "shortDescription": "Reuse task state and measure task efficiency.",
-    "longDescription": "Testable beta with an offline walkthrough, multi-turn Codex launcher, source and task-memory MCP tools, compact logs, reusable SSH connections and datasets. Usage is measured; savings are not guaranteed.",
+    "longDescription": "Testable beta with a local browser dashboard, offline walkthrough, multi-turn Codex launcher, source and task-memory MCP tools, compact logs, reusable SSH connections and datasets. Usage is measured; savings are not guaranteed.",
     "developerName": "Local developer",
     "category": "Productivity",
     "capabilities": [],

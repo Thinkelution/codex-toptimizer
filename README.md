@@ -1,6 +1,6 @@
 # Codex TaskLean
 
-**0.3 beta:** [Install and try the guided walkthrough](plugins/tasklean/docs/beta.md). The beta includes an offline demo, a launcher that resumes the same Codex conversation, focused source tools, durable task notes and retrievable compact logs.
+**0.3 beta:** [Install and try the guided walkthrough](plugins/tasklean/docs/beta.md). The beta includes a local browser dashboard, an offline demo, a launcher that resumes the same Codex conversation, focused source tools, durable task notes and retrievable compact logs.
 
 Task efficiency for Codex: reviewable prompt preparation, measured execution usage, reusable SSH connections, and task-scoped datasets held in server memory.
 
@@ -10,6 +10,8 @@ The installable plugin lives in [`plugins/tasklean`](plugins/tasklean). Its pack
 
 ```bash
 cd plugins/tasklean
+python3 scripts/tasklean.py ui
+# Opens the dashboard in your browser. CLI commands are also available.
 python3 scripts/tasklean.py --help
 python3 -m unittest discover -s tests -v
 ```

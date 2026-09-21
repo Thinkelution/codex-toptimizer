@@ -93,6 +93,7 @@ def launch(directory, prompt, binary=None, model=None, reasoning=None, sandbox='
             out = work.directory / 'turns' / turn
             out.mkdir(mode=0o700)
             private_write(out / 'prompt.txt', submitted)
+            private_write(out / 'user_prompt.txt', prompt)
             result = execute(args, submitted, out, timeout)
             thread, answer = parse_events((out / 'events.jsonl').read_text())
             if thread:
