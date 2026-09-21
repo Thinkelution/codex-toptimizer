@@ -27,6 +27,8 @@ tasklean ui
 
 This starts a local server on a free loopback port and opens your browser. Keep the terminal running. Create a task by entering an existing project folder and a goal, or **Import existing task** by entering a folder containing `task.json`. The default UI state lives under `~/.local/share/tasklean/ui`, separate from your source. Use `--state-dir PATH` for another private state location, `--port 8785` for a fixed port, or `--no-open` to print the launch URL without opening a browser.
 
+To connect another browser, copy the full launch URL from the currently running terminal, including `#token=…`. Each launcher restart generates a new token, so older links expire. The page stores the token for that browser tab and removes it from the address bar after reading it; this is expected. Opening a fresh launch link in an existing tab reconnects the page even if only the URL fragment changes.
+
 - **Try the offline demo** creates a disposable example with saved test logs and a stale-evidence note. No inference is involved.
 - **Account limits** shows each account-reported quota group, the percentage remaining, and both a reset countdown and local reset date/time. Windows are labeled by their reported duration (weekly, five-hour, or another duration), not assumed from their order. This is shared account capacity, separate from the current task's measured tokens.
 - Quota groups stay in a stable order across refreshes, with Codex first.

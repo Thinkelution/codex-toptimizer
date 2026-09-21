@@ -1,6 +1,11 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later */
 'use strict';
 const $ = id => document.getElementById(id);
+// Opening another launch link in this tab can be a fragment-only navigation.
+// Reload so the normal connection setup consumes the new token and clears old state.
+window.addEventListener('hashchange', () => {
+  if (new URLSearchParams(location.hash.slice(1)).has('token')) location.reload();
+});
 const fragment = new URLSearchParams(location.hash.slice(1));
 if (fragment.has('token')) { sessionStorage.setItem('tasklean-token', fragment.get('token')); history.replaceState(null, '', '/'); }
 const token = sessionStorage.getItem('tasklean-token') || '';
@@ -9,7 +14,9 @@ const drafts = new Map();
 function error(e) { $('error').textContent = e.message || String(e); $('error').hidden = false; }
 async function api(path, data) {
   const response = await fetch(path, {method: data === undefined ? 'GET' : 'POST', headers: {'X-TaskLean-Token': token, 'Content-Type': 'application/json'}, ...(data === undefined ? {} : {body: JSON.stringify(data)})});
-  const result = await response.json(); if (!response.ok) throw new Error(result.error || 'Request failed');
+  const result = await response.json();
+  if (!response.ok) throw new Error(response.status === 401 ?
+    'This connection token is missing or expired. Open the latest launch URL from the running tasklean ui terminal. Earlier links expire when the launcher restarts.' : result.error || 'Request failed');
   return result;
 }
 function element(tag, text, className) { const el = document.createElement(tag); el.textContent = text; if (className) el.className = className; return el; }
