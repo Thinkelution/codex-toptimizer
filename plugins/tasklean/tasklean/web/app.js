@@ -13,7 +13,17 @@ async function api(path, data) {
   return result;
 }
 function element(tag, text, className) { const el = document.createElement(tag); el.textContent = text; if (className) el.className = className; return el; }
-let projects = [], deletedTasks = [], deletingTask = null;
+let projects = [], deletedTasks = [], deletingTask = null, homeDirectory = '';
+let lastProject = '';
+try { lastProject = localStorage.getItem('tasklean-last-project') || ''; } catch (_) { /* Browser storage may be disabled. */ }
+function rememberProject() {
+  lastProject = $('projectPath').value.trim();
+  try {
+    if (lastProject) localStorage.setItem('tasklean-last-project', lastProject);
+    else localStorage.removeItem('tasklean-last-project');
+  } catch (_) { /* Keep the preference in memory for this page. */ }
+}
+$('projectPath').addEventListener('change', rememberProject);
 const collapsedProjects = new Set();
 function home() {
   selected = null; busy = false; rendered = '';
@@ -39,7 +49,7 @@ function renderDeleted() {
 }
 async function list() {
   const data = await api('/api/tasks');
-  projects = data.projects; deletedTasks = data.deleted;
+  projects = data.projects; deletedTasks = data.deleted; homeDirectory = data.home_directory;
   if (selected && !data.tasks.some(t => t.id === selected)) home();
   $('tasks').replaceChildren(); $('knownProjects').replaceChildren();
   for (const project of projects) {
@@ -64,9 +74,12 @@ async function list() {
   $('showDeleted').textContent = 'Recently deleted' + (deletedTasks.length ? ` (${deletedTasks.length})` : '');
   renderDeleted();
 }
-function openCreate(project) {
-  $('projectPath').value = project || (selected ? $('project').textContent : '');
-  $('taskGoal').value = ''; $('createDialog').showModal();
+async function openCreate(project) {
+  try {
+    if (!homeDirectory) await list();
+    $('projectPath').value = project || lastProject || homeDirectory;
+    $('taskGoal').value = ''; $('createDialog').showModal();
+  } catch(e) { error(e); }
 }
 async function choose(id) { if (selected) drafts.set(selected, $('prompt').value); $('prompt').value = drafts.get(id) || ''; selected = id; sessionStorage.setItem('tasklean-selected', id); $('error').hidden = true; await list(); await refresh(); }
 async function refresh() {
@@ -117,7 +130,7 @@ $('confirmDelete').onclick=async()=>{
 };
 $('importTask').onclick=()=>$('importDialog').showModal();
 for (const b of document.querySelectorAll('[data-close]')) b.onclick=()=>b.closest('dialog').close();
-$('createForm').onsubmit=async e=>{e.preventDefault(); try { const r=await api('/api/tasks',{project:$('projectPath').value,goal:$('taskGoal').value}); $('createDialog').close(); await choose(r.task); } catch(e){$('createDialog').close();error(e);} };
+$('createForm').onsubmit=async e=>{e.preventDefault(); rememberProject(); try { const r=await api('/api/tasks',{project:$('projectPath').value,goal:$('taskGoal').value}); $('createDialog').close(); await choose(r.task); } catch(e){$('createDialog').close();error(e);} };
 $('importForm').onsubmit=async e=>{e.preventDefault(); try { const r=await api('/api/import',{directory:$('taskPath').value}); $('importDialog').close(); await choose(r.task); } catch(e){$('importDialog').close();error(e);} };
 $('demo').onclick=async()=>{ $('demo').disabled=true; $('demo').textContent='Running offline checks…'; try { const r=await api('/api/demo',{}); await choose(r.task); }catch(e){error(e);}finally{$('demo').disabled=false;$('demo').textContent='Try the offline demo';} };
 $('promptForm').onsubmit=async e=>{

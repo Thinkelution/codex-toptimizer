@@ -174,7 +174,7 @@ The account-limit integration uses the documented [Codex app-server account/rate
 
 ## Organize and delete tasks
 
-The sidebar groups tasks by their resolved project folder. Expand or collapse a project, use its **New task** button, or choose a recent folder when creating a task. Folders with the same name stay separate; their full paths appear in the sidebar.
+The sidebar groups tasks by their resolved project folder. Expand or collapse a project, use its **New task** button, or choose a recent folder when creating a task. The New task dialog defaults to the last folder entered in this browser, or your home folder on first use. A project’s New task button uses that project’s folder. Folders with the same name stay separate; their full paths appear in the sidebar.
 
 Use **Delete task** on an idle task to move it to **Recently deleted**. Confirm the dialog to remove it from the active project list. Restore it from **Recently deleted**; the deletion state survives dashboard restarts. This is a recoverable dashboard deletion: project files, task conversations, notes, and logs remain on disk, and reimporting the task restores it. A running dashboard turn must finish before deletion. Deletion does not reclaim disk space or delete the underlying Codex conversation.
 
