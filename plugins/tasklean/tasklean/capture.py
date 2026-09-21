@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
 """Compact stdout at the execution boundary, with retrievable bounded raw logs."""
 import json
 import os

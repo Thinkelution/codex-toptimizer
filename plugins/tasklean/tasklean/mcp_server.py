@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
 """Small newline-delimited JSON-RPC MCP server. No command execution tool."""
 import json
 import sys

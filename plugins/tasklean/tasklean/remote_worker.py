@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
 """Standalone SSH-side, task-scoped dataset worker. Standard library only.
 
 No TCP listener, arbitrary code evaluation, or implicit command execution.

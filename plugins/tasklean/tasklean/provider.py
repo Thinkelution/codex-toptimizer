@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
 """Optional model rewrite. No tools, no repository reads, one API request."""
 import json
 import os

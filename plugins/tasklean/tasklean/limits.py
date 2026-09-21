@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
 """Read account quota through Codex's documented app-server protocol; no inference."""
 import json
 import math

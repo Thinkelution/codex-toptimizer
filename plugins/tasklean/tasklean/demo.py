@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
 """Deterministic offline beta walkthrough. Never claims measured model savings."""
 import html
 import json

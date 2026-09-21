@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
 """Passive hook: bounded local counts only. No raw prompts, network or model call."""
 import json
 import math

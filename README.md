@@ -30,3 +30,11 @@ The session layer reuses an OpenSSH connection and a separate dataset worker acr
 **Product status:** testable local/SSH beta with a public setup website. The local execution dashboard stays on each user’s machine; no hosted task execution or billing. `codex-toptimizer.thinkelution.com` redirects to the primary site. Cloudflare proxies HTTPS to an Nginx static origin. Remote datasets use SSH and a private Unix socket; launcher tools use local MCP stdio.
 
 Model-based prompt rewriting is optional and uses a separately configured OpenAI API key. Local audit, session, dataset and test commands need no model inference.
+
+## License and hosted services
+
+Codex LeanTask is licensed under **GNU GPL version 3 or later** (`GPL-3.0-or-later`). See [LICENSE](LICENSE) and [NOTICE](NOTICE). Distributed builds include the license; recipients retain the rights to obtain corresponding source, modify, and redistribute covered code.
+
+Cross-login task resume and hosted sync are in development, not available in this beta. Optional hosted sync, storage, and support may be paid services; pricing is not announced. The local GPL app does not require a LeanTask subscription.
+
+The local UI offers explicit feedback submission to Thinkelution. Only the form contents and app version are sent; no project context or credentials are attached. See the [feedback notice](https://codex-lean-task.thinkelution.com/#feedback-privacy).

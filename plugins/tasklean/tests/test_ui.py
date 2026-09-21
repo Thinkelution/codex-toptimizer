@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
 import http.client
 import json
 from pathlib import Path
@@ -44,6 +45,15 @@ class DashboardTests(unittest.TestCase):
         status, data = self.request('/api/tasks', {'project': str(self.project), 'goal': 'Review the app'})
         self.assertEqual(status, 200, data)
         return data['task']
+
+    def test_feedback_requires_local_auth_and_does_not_add_task_context(self):
+        self.create()
+        data = {'message': 'Useful app', 'rating': 4, 'email': '', 'consent': True, 'submission_id': 'test-id'}
+        with patch('tasklean.feedback.submit_feedback', return_value={'received': True}) as submit:
+            self.assertEqual(self.request('/api/feedback', data, token=False)[0], 401)
+            submit.assert_not_called()
+            self.assertEqual(self.request('/api/feedback', data)[0], 200)
+            submit.assert_called_once_with(data)
 
     def test_account_limits_endpoint_requires_auth_and_supports_refresh(self):
         snapshot={'available':False,'buckets':[],'checked_at':None}

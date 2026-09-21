@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
 """Durable task state and bounded, versioned repository reads. No inference."""
 import ast
 import difflib

@@ -1,6 +1,6 @@
 {
   "name": "tasklean",
-  "version": "0.3.0-beta.5+codex.20260921104524",
+  "version": "0.3.0-beta.6+codex.20260921105703",
   "description": "Task-scoped SSH and dataset reuse, reviewable prompt optimization, and measured Codex usage.",
   "author": {
     "name": "Local developer"

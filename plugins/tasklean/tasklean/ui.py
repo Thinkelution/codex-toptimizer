@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
 """Loopback-only browser launcher. No hosted credentials or global Codex edits."""
 import json
 import os
@@ -150,6 +151,9 @@ class Dashboard:
         return {'accepted': True}
 
     def action(self, route, data):
+        if route == '/api/feedback':
+            from .feedback import submit_feedback
+            return submit_feedback(data)
         if route == '/api/tasks':
             goal, project = data.get('goal'), data.get('project')
             if not isinstance(goal, str) or not isinstance(project, str) or not project.strip():

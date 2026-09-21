@@ -1,6 +1,6 @@
 # Codex LeanTask public beta website
 
-Static HTML, CSS, and JavaScript. No runtime dependencies, analytics, forms or task execution endpoints. Installation links point to the public repository's main branch. The workspace preview is illustrative content, not a model run.
+Static HTML, CSS, and JavaScript. No website runtime dependencies, analytics, forms or task execution endpoints. A separate write-only feedback service accepts explicit submissions from the local dashboard; see [feedback operations](../ops/feedback.md). Installation links point to the public repository's main branch. The workspace preview is illustrative content, not a model run.
 
 Preview locally:
 
@@ -18,4 +18,4 @@ The host-specific configuration is in `ops/tasklean-site.nginx.conf`. Test with 
 
 The existing Certbot account issued a certificate covering both hostnames using HTTP webroot validation at `/var/www/tasklean-acme`. The port 80 challenge exception remains available while normal HTTP redirects to HTTPS. `certbot.timer` is enabled, and `ops/renew-tasklean-tls.sh` reloads Nginx after renewal of this certificate. Cloudflare proxying does not need to be disabled for this setup.
 
-Verify the origin with `curl --resolve codex-lean-task.thinkelution.com:443:127.0.0.1 https://codex-lean-task.thinkelution.com/` on the server, then verify the normal public HTTPS address, static assets, alternate redirect and an expected 404 for `/api/tasks`. The site has a restrictive CSP and no connection to local/private tasks.
+Verify the origin with `curl --resolve codex-lean-task.thinkelution.com:443:127.0.0.1 https://codex-lean-task.thinkelution.com/` on the server, then verify the normal public HTTPS address, static assets, alternate redirect and an expected 404 for `/api/tasks`. The site has a restrictive CSP and no connection to local/private tasks. Only POST /api/feedback is proxied to the private feedback receiver.

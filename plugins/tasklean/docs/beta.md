@@ -187,3 +187,11 @@ For example, “fix the cart total” followed by “add a regression test” ma
 The launcher may use fewer, equal or more tokens than running the same task directly in Codex. Its instructions, tool definitions, notes and receipts also cost context. No controlled comparison has established net savings yet. Compare identical tasks, starting code, model and quality requirements across the whole prompt sequence, counting retries and overhead. Token counts alone do not establish dollar savings or reduced weekly allowance consumption.
 
 The app’s display name is **Codex LeanTask**. The package, command, plugin ID and existing task-state paths remain `tasklean` for compatibility.
+
+## Send feedback
+
+Use **Send feedback** in the sidebar. The form sends your message, optional rating/email, app version, and a submission reference to Thinkelution only after you press **Send to Thinkelution**. It does not attach task files, prompts, logs, usage, or credentials. Errors retain your text so you can retry; repeat submissions with the same reference are deduplicated. This optional action uses HTTPS but makes no model call. Read the [feedback notice](https://codex-lean-task.thinkelution.com/#feedback-privacy).
+
+## License and roadmap
+
+This beta is GPLv3-or-later; see [LICENSE](../LICENSE). Cross-login task resume, hosted sync, storage, and recovery are in development. The existing launcher resumes local tasks with the available Codex login; it cannot currently move a Codex conversation between accounts. Hosted services may be offered for a fee separately from the GPL app.

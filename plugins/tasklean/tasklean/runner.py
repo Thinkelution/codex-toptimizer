@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
 """Explicit Codex launcher; no shell interpolation or permission bypasses."""
 import hashlib
 import json

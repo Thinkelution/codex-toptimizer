@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
 """Metadata-only repository instruction audit, no file content returned."""
 import os
 from pathlib import Path

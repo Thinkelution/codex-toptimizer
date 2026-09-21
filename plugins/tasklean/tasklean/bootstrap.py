@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
 """Stable absolute entry point usable from an unpacked source tree or a wheel."""
 import sys
 from pathlib import Path
