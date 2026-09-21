@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
 """Pure prompt checks. Estimates are deliberately separate from measured usage."""
 import hashlib
 import math

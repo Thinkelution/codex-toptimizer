@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
 """Explicit multi-turn Codex launcher; supplies scoped tools without global config edits."""
 import fcntl
 import json

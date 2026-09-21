@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
 """Relocatable entry point; works without pip installation."""
 from pathlib import Path
 import sys

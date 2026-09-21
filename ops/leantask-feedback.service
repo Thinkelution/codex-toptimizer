@@ -1,0 +1,28 @@
+[Unit]
+Description=Codex LeanTask private feedback receiver
+After=network.target
+
+[Service]
+Type=simple
+User=leantask-feedback
+Group=leantask-feedback
+WorkingDirectory=/opt/codex-leantask-feedback/current
+Environment=PYTHONPATH=/opt/codex-leantask-feedback/current/plugins/tasklean
+Environment=PYTHONDONTWRITEBYTECODE=1
+ExecStart=/usr/bin/python3 -m tasklean.feedback_service serve --database /var/lib/leantask-feedback/feedback.sqlite3 --port 8798
+Restart=on-failure
+RestartSec=3
+StateDirectory=leantask-feedback
+StateDirectoryMode=0700
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/leantask-feedback
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+MemoryMax=128M
+TasksMax=64
+
+[Install]
+WantedBy=multi-user.target

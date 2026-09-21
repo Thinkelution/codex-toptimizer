@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
 """Aggregate documented codex exec turn usage without counting cached tokens twice."""
 import json
 

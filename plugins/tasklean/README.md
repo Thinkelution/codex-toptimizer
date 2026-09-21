@@ -134,3 +134,11 @@ Tests use synthetic prompts, mocked API responses, temporary repositories, and l
 - [Structured outputs](https://developers.openai.com/api/docs/guides/structured-outputs)
 
 Implementation checked against local Codex `0.155.0-alpha.9.2` help and official documentation on September 21, 2026. Live API compatibility and live Codex execution remain to be benchmarked.
+
+## License and hosted services
+
+Codex LeanTask is licensed under **GNU GPL version 3 or later** (`GPL-3.0-or-later`). See [LICENSE](LICENSE) and [NOTICE](NOTICE). Distributed builds include the license; recipients retain the rights to obtain corresponding source, modify, and redistribute covered code.
+
+Cross-login task resume and hosted sync are in development, not available in this beta. Optional hosted sync, storage, and support may be paid services; pricing is not announced. The local GPL app does not require a LeanTask subscription.
+
+The local UI offers explicit feedback submission to Thinkelution. Only the form contents and app version are sent; no project context or credentials are attached. See the [feedback notice](https://codex-lean-task.thinkelution.com/#feedback-privacy).

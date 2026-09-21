@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: GPL-3.0-or-later */
 'use strict';
 const tabs = Array.from(document.querySelectorAll('[role="tab"]'));
 function activate(tab) {

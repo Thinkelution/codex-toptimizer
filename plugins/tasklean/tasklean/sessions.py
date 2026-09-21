@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
 """Task-scoped SSH transport reuse and explicit remote dataset handles."""
 import hashlib
 import json

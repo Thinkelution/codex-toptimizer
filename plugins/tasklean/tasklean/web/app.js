@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: GPL-3.0-or-later */
 'use strict';
 const $ = id => document.getElementById(id);
 const fragment = new URLSearchParams(location.hash.slice(1));
@@ -192,3 +193,20 @@ loadLimits();
 setInterval(()=>{if(!document.hidden)loadLimits();},60000);
 setInterval(()=>{if(!document.hidden)renderLimits();},15000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)loadLimits();});
+
+let feedbackAttempt = null;
+$('feedbackButton').onclick = () => $('feedbackDialog').showModal();
+$('feedbackForm').onsubmit = async event => {
+  event.preventDefault();
+  if ($('sendFeedback').disabled) return;
+  const fields = {message: $('feedbackMessage').value.trim(), rating: $('feedbackRating').value ? Number($('feedbackRating').value) : null, email: $('feedbackEmail').value.trim(), consent: true};
+  const signature = JSON.stringify(fields);
+  if (!feedbackAttempt || feedbackAttempt.signature !== signature) feedbackAttempt = {signature, id: crypto.randomUUID()};
+  $('sendFeedback').disabled = true; $('feedbackStatus').textContent = 'Sending feedback…';
+  try {
+    const result = await api('/api/feedback', {...fields, submission_id: feedbackAttempt.id});
+    $('feedbackForm').reset(); feedbackAttempt = null;
+    $('feedbackStatus').textContent = 'Thank you — Thinkelution received your feedback. Reference: ' + result.submission_id;
+  } catch(e) { $('feedbackStatus').textContent = e.message; }
+  finally { $('sendFeedback').disabled = false; }
+};
