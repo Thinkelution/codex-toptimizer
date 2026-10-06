@@ -8,7 +8,7 @@ from urllib.request import Request, HTTPRedirectHandler, build_opener
 
 from . import __version__
 
-FEEDBACK_URL = 'https://codex-lean-task.thinkelution.com/api/feedback'
+FEEDBACK_URL = 'https://feedback.thinkelution.com/api/feedback'
 
 
 def validate_feedback(data):

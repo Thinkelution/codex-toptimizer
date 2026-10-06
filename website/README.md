@@ -12,13 +12,13 @@ Production: https://codex-lean-task.thinkelution.com/ . The alternate https://co
 
 ## Deployment
 
-Cloudflare can remain proxied. Nginx serves only this directory from `/var/www/tasklean-site/current`, a symlink into versioned `releases/` directories. Private app releases and task state stay under the administrator's private home directory and are not web roots. Do not expose `tasklean ui` through this virtual host.
+GitHub Pages serves this directory. `.github/workflows/pages.yml` publishes `website/` on every push to `main` that touches it (or from **Run workflow**); there is no build step. Roll back by reverting the commit. The custom domain and HTTPS are set in the repository's Pages settings, with a DNS-only Cloudflare CNAME from `codex-lean-task` to `thinkelution.github.io`.
 
-The host-specific configuration is in `ops/tasklean-site.nginx.conf`. Test with `sudo nginx -t` before reloading. Copy only public site assets to a new release, then replace the current symlink atomically. Roll back by pointing the symlink at the previous release and verifying responses. No app process restart is needed for static changes.
+Pages can't send response headers, so each page carries its Content-Security-Policy and referrer policy in `<meta>` tags. Add both to any new page. Meta CSP can't set `frame-ancestors`, so framing protection isn't available on Pages.
 
-The existing Certbot account issued a certificate covering both hostnames using HTTP webroot validation at `/var/www/tasklean-acme`. The port 80 challenge exception remains available while normal HTTP redirects to HTTPS. `certbot.timer` is enabled, and `ops/renew-tasklean-tls.sh` reloads Nginx after renewal of this certificate. Cloudflare proxying does not need to be disabled for this setup.
+`codex-toptimizer.thinkelution.com` and the feedback receiver run separately on AWS; see [feedback operations](../ops/feedback.md).
 
-Verify the origin with `curl --resolve codex-lean-task.thinkelution.com:443:127.0.0.1 https://codex-lean-task.thinkelution.com/` on the server, then verify the normal public HTTPS address, static assets, alternate redirect and an expected 404 for `/api/tasks`. The site has a restrictive CSP and no connection to local/private tasks. Only POST /api/feedback is proxied to the private feedback receiver.
+After publishing, verify the public HTTPS address, static assets, the alternate redirect, and an expected 404 for `/api/tasks`. The site has no connection to local/private tasks.
 
 ## Published case study
 
@@ -26,7 +26,7 @@ Verify the origin with `curl --resolve codex-lean-task.thinkelution.com:443:127.
 
 The page includes a curated `results.json`, the exact task prompt, and a ZIP of the original starter with its 23 fixed tests and license files. Full execution transcripts and private task state are not public assets. Keep the retry, verification, caching, accounting and single-pair limitations adjacent to any usage-reduction claim. The original local experiment recorded source commit `7cb9ca66de09a79b33b89a5920e920cccbd88410` (LeanTask 0.3.0b6).
 
-The page is static and has no script or runtime dependencies. Its responsive styling extends the existing brand through `assets/case-study.css`; the homepage uses `assets/site.css`. Deploy the complete `website/` directory into a fresh versioned release and switch the existing `current` symlink only after verifying the files.
+The page is static and has no script or runtime dependencies. Its responsive styling extends the existing brand through `assets/case-study.css`; the homepage uses `assets/site.css`. Merging to `main` publishes the complete `website/` directory.
 
 The `#without-sandbox-retries` section adds an accounting-only subtotal: excluding two identified browser-retry requests (41,586 + 41,870 tokens) from the normal run leaves 379,221 tokens. All 13 per-request usage records reconcile with the measured final total. The selected records are included in `results.json`. This is not a measured failure-free run: it retains the first browser attempt, fallback tests, patch retry and later recorded context. Keep those assumptions alongside the estimate and its 61.02% numerical comparison; do not replace the original measured totals.
 

@@ -27,7 +27,7 @@ The session layer reuses an OpenSSH connection and a separate dataset worker acr
 
 **Verified:** local tests and an actual SSH smoke test against the supplied Linux server. One 20,000-row dataset was parsed once and queried repeatedly by the same worker. Editing the source triggered stale-cache rejection. This demonstrates transport/state reuse, not a proven LLM token savings percentage.
 
-**Product status:** testable local/SSH beta with a public setup website. The local execution dashboard stays on each user’s machine; no hosted task execution or billing. `codex-toptimizer.thinkelution.com` redirects to the primary site. Cloudflare proxies HTTPS to an Nginx static origin. Remote datasets use SSH and a private Unix socket; launcher tools use local MCP stdio.
+**Product status:** testable local/SSH beta with a public setup website. The local execution dashboard stays on each user’s machine; no hosted task execution or billing. `codex-toptimizer.thinkelution.com` redirects to the primary site. GitHub Pages hosts the static site; dashboard feedback goes to a separate receiver at `feedback.thinkelution.com`. Remote datasets use SSH and a private Unix socket; launcher tools use local MCP stdio.
 
 Model-based prompt rewriting is optional and uses a separately configured OpenAI API key. Local audit, session, dataset and test commands need no model inference.
 
