@@ -1,6 +1,6 @@
 # Codex LeanTask
 
-**Website:** [codex-lean-task.thinkelution.com](https://codex-lean-task.thinkelution.com/) — setup guide and interactive preview.
+**Website:** [thinkelution.github.io/codex-toptimizer](https://thinkelution.github.io/codex-toptimizer/) — setup guide and interactive preview.
 
 **0.3 beta:** [Install and try the guided walkthrough](plugins/tasklean/docs/beta.md). The beta includes a local browser dashboard, an offline demo, a launcher that resumes the same Codex conversation, focused source tools, durable task notes and retrievable compact logs.
 
@@ -27,7 +27,7 @@ The session layer reuses an OpenSSH connection and a separate dataset worker acr
 
 **Verified:** local tests and an actual SSH smoke test against the supplied Linux server. One 20,000-row dataset was parsed once and queried repeatedly by the same worker. Editing the source triggered stale-cache rejection. This demonstrates transport/state reuse, not a proven LLM token savings percentage.
 
-**Product status:** testable local/SSH beta with a public setup website. The local execution dashboard stays on each user’s machine; no hosted task execution or billing. `codex-toptimizer.thinkelution.com` redirects to the primary site. GitHub Pages hosts the static site; dashboard feedback goes to a separate receiver at `feedback.thinkelution.com`. Remote datasets use SSH and a private Unix socket; launcher tools use local MCP stdio.
+**Product status:** testable local/SSH beta with a public setup website. The local execution dashboard stays on each user’s machine; no hosted task execution or billing. GitHub Pages hosts the static site at thinkelution.github.io/codex-toptimizer; dashboard feedback goes to a separate receiver at `feedback.thinkelution.com`. Remote datasets use SSH and a private Unix socket; launcher tools use local MCP stdio.
 
 Model-based prompt rewriting is optional and uses a separately configured OpenAI API key. Local audit, session, dataset and test commands need no model inference.
 
@@ -37,4 +37,4 @@ Codex LeanTask is licensed under **GNU GPL version 3 or later** (`GPL-3.0-or-lat
 
 Cross-login task resume and hosted sync are in development, not available in this beta. Optional hosted sync, storage, and support may be paid services; pricing is not announced. The local GPL app does not require a LeanTask subscription.
 
-The local UI offers explicit feedback submission to Thinkelution. Only the form contents and app version are sent; no project context or credentials are attached. See the [feedback notice](https://codex-lean-task.thinkelution.com/#feedback-privacy).
+The local UI offers explicit feedback submission to Thinkelution. Only the form contents and app version are sent; no project context or credentials are attached. See the [feedback notice](https://thinkelution.github.io/codex-toptimizer/#feedback-privacy).
