@@ -1,5 +1,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
-"""Private feedback store behind Nginx. No public read endpoint."""
+"""Self-hostable feedback store. No public read endpoint.
+
+Thinkelution's hosted receiver (feedback.thinkelution.com) runs on AWS with the
+same request and reply contract; see ops/feedback.md.
+"""
 import argparse
 import json
 import os
