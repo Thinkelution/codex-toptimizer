@@ -195,7 +195,7 @@ The app’s display name is **Codex LeanTask**. The package, command, plugin ID 
 
 ## Send feedback
 
-Use **Send feedback** in the sidebar. The form sends your message, optional rating/email, app version, and a submission reference to Thinkelution only after you press **Send to Thinkelution**. It does not attach task files, prompts, logs, usage, or credentials. Errors retain your text so you can retry; repeat submissions with the same reference are deduplicated. This optional action uses HTTPS but makes no model call. Read the [feedback notice](https://codex-lean-task.thinkelution.com/#feedback-privacy).
+Use **Send feedback** in the sidebar. The form sends your message, optional rating/email, app version, and a submission reference to Thinkelution only after you press **Send to Thinkelution**. It does not attach task files, prompts, logs, usage, or credentials. Errors retain your text so you can retry; repeat submissions with the same reference are deduplicated. This optional action uses HTTPS but makes no model call. Read the [feedback notice](https://thinkelution.github.io/codex-toptimizer/#feedback-privacy).
 
 ## License and roadmap
 

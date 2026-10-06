@@ -8,15 +8,15 @@ Preview locally:
 python3 -m http.server 8792 --bind 127.0.0.1 --directory website
 ```
 
-Production: https://codex-lean-task.thinkelution.com/ . The alternate https://codex-toptimizer.thinkelution.com/ redirects to it.
+Production: https://thinkelution.github.io/codex-toptimizer/ (GitHub Pages, no custom domain).
 
 ## Deployment
 
-GitHub Pages serves this directory. `.github/workflows/pages.yml` publishes `website/` on every push to `main` that touches it (or from **Run workflow**); there is no build step. Roll back by reverting the commit. The custom domain and HTTPS are set in the repository's Pages settings, with a DNS-only Cloudflare CNAME from `codex-lean-task` to `thinkelution.github.io`.
+GitHub Pages serves this directory. `.github/workflows/pages.yml` publishes `website/` on every push to `main` that touches it (or from **Run workflow**); there is no build step. Roll back by reverting the commit. The site lives under `/codex-toptimizer/`, so links and asset paths must be relative (no leading `/`).
 
 Pages can't send response headers, so each page carries its Content-Security-Policy and referrer policy in `<meta>` tags. Add both to any new page. Meta CSP can't set `frame-ancestors`, so framing protection isn't available on Pages.
 
-`codex-toptimizer.thinkelution.com` and the feedback receiver run separately on AWS; see [feedback operations](../ops/feedback.md).
+The feedback receiver runs separately on AWS; see [feedback operations](../ops/feedback.md).
 
 After publishing, verify the public HTTPS address, static assets, the alternate redirect, and an expected 404 for `/api/tasks`. The site has no connection to local/private tasks.
 

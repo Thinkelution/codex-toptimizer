@@ -141,4 +141,4 @@ Codex LeanTask is licensed under **GNU GPL version 3 or later** (`GPL-3.0-or-lat
 
 Cross-login task resume and hosted sync are in development, not available in this beta. Optional hosted sync, storage, and support may be paid services; pricing is not announced. The local GPL app does not require a LeanTask subscription.
 
-The local UI offers explicit feedback submission to Thinkelution. Only the form contents and app version are sent; no project context or credentials are attached. See the [feedback notice](https://codex-lean-task.thinkelution.com/#feedback-privacy).
+The local UI offers explicit feedback submission to Thinkelution. Only the form contents and app version are sent; no project context or credentials are attached. See the [feedback notice](https://thinkelution.github.io/codex-toptimizer/#feedback-privacy).
